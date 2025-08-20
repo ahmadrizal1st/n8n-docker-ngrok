@@ -1,0 +1,13 @@
+version: "2"
+authtoken: ${NGROK_AUTHTOKEN}
+region: us
+log_level: info
+log_format: json
+tunnels:
+  n8n:
+    proto: http
+    addr: n8n:5678
+    host_header: rewrite
+    schemes:
+      - https
+    inspect: false
