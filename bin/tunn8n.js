@@ -124,7 +124,7 @@ program
   .action(() => {
     console.log(chalk.blue("Checking service status..."));
     try {
-      execSync("./check-status.sh", { stdio: "inherit" });
+      execSync("./status.sh", { stdio: "inherit" });
     } catch (error) {
       console.log(chalk.red("Error checking status:"), error.message);
     }
