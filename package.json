@@ -11,19 +11,19 @@
     "tunnel",
     "webhook"
   ],
-  "homepage": "https://github.com/ahmadrizal1st/n8n-docker-ngrok#readme",
+  "homepage": "https://github.com/ahmadrizal1st/tunn8n#readme",
   "bugs": {
-    "url": "https://github.com/ahmadrizal1st/n8n-docker-ngrok/issues"
+    "url": "https://github.com/ahmadrizal1st/tunn8n/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ahmadrizal1st/n8n-docker-ngrok.git"
+    "url": "git+https://github.com/ahmadrizal1st/tunn8n.git"
   },
   "license": "MIT",
   "author": "Ahmad Rizal",
   "type": "commonjs",
   "main": "index.js",
   "scripts": {
-    "test": "./check-status.sh --test"
+    "test": "./status.sh --test"
   }
 }

@@ -41,9 +41,6 @@ program
       const templateFiles = [
         "docker-compose.yml",
         ".env.example",
-        "start.sh",
-        "debug.sh",
-        "check-status.sh",
         ".gitignore",
         "README.md",
       ];
@@ -103,6 +100,61 @@ program
           "Make sure Docker is running and you have proper permissions"
         )
       );
+    }
+  });
+
+// ADDED STOP COMMAND HERE
+program
+  .command("stop")
+  .description("Stop all Docker containers for tunn8n project using stop.sh")
+  .action(() => {
+    console.log(chalk.blue("Stopping tunn8n services..."));
+    try {
+      // Check if stop.sh exists
+      if (!fs.existsSync("stop.sh")) {
+        console.log(
+          chalk.yellow("stop.sh not found, using docker-compose directly...")
+        );
+        // Fallback to direct docker-compose command
+        execSync("docker-compose down", { stdio: "inherit" });
+        console.log(chalk.green("✓ Services stopped successfully!"));
+        return;
+      }
+
+      // Make sure stop.sh is executable
+      try {
+        fs.chmodSync("stop.sh", "755");
+      } catch (chmodError) {
+        // Silently continue if chmod fails
+        console.log(
+          chalk.gray("Note: Could not set execute permissions on stop.sh")
+        );
+      }
+
+      // Execute the stop.sh script
+      execSync("./stop.sh", { stdio: "inherit" });
+      console.log(chalk.green("✓ Services stopped successfully!"));
+    } catch (error) {
+      console.log(chalk.red("Error stopping tunn8n:"), error.message);
+      console.log(
+        chalk.yellow(
+          "Make sure Docker is running and you have proper permissions"
+        )
+      );
+
+      // Fallback to direct docker command if stop.sh fails
+      try {
+        console.log(
+          chalk.yellow("Trying fallback method with docker-compose...")
+        );
+        execSync("docker-compose down", { stdio: "inherit" });
+        console.log(chalk.green("✓ Services stopped using fallback method!"));
+      } catch (fallbackError) {
+        console.log(
+          chalk.red("Fallback method also failed:"),
+          fallbackError.message
+        );
+      }
     }
   });
 
@@ -185,6 +237,7 @@ if (process.argv.length === 2) {
     chalk.cyan("  tunn8n init                 # Initialize environment")
   );
   console.log(chalk.cyan("  tunn8n start                # Start services"));
+  console.log(chalk.cyan("  tunn8n stop                 # Stop services"));
   console.log(chalk.cyan("  tunn8n status               # Check status"));
 }
 

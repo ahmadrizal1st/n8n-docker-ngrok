@@ -114,7 +114,12 @@ tunn8n status
 
 # View debug information and logs
 tunn8n debug
+
+# Stop all services
+tunn8n stop
 ```
+
+
 
 ### Information
 
@@ -215,18 +220,18 @@ docker system prune -f
 ### Common Issues
 
 1. **Port 5678 already in use**
-
+   
    ```bash
    # Change port in docker-compose.yml
    ports:
      - "5679:5678"  # host:container
    ```
 2. **Ngrok authentication errors**
-
+   
    - Verify `NGROK_AUTHTOKEN` in `.env` file
    - Check token at [Ngrok Dashboard](https://dashboard.ngrok.com/get-started/your-authtoken)
 3. **Docker permission issues** (Linux)
-
+   
    ```bash
    sudo usermod -aG docker $USER
    newgrp docker
@@ -298,7 +303,7 @@ tunn8n start
 tunn8n status
 
 # When done working
-docker-compose down
+tunn8n stop
 ```
 
 ## 📝 License
@@ -310,3 +315,4 @@ MIT License - feel free to use this project for your automation needs!
 **Happy Automating!** 🚀
 
 *For issues and contributions, please check the project repository.*
+
