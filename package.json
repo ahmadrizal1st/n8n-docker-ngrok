@@ -1,0 +1,29 @@
+{
+  "name": "tunn8n",
+  "version": "1.0.0",
+  "description": "🚀 A production-ready template to kickstart your n8n automation workflows with Docker and Ngrok. This template provides a isolated, containerized environment for n8n with secure, instant tunneling for local development and testing webhooks.",
+  "keywords": [
+    "n8n",
+    "docker",
+    "ngrok",
+    "automation",
+    "workflow",
+    "tunnel",
+    "webhook"
+  ],
+  "homepage": "https://github.com/ahmadrizal1st/n8n-docker-ngrok#readme",
+  "bugs": {
+    "url": "https://github.com/ahmadrizal1st/n8n-docker-ngrok/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ahmadrizal1st/n8n-docker-ngrok.git"
+  },
+  "license": "MIT",
+  "author": "Ahmad Rizal",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "./check-status.sh --test"
+  }
+}
