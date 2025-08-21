@@ -1,412 +1,305 @@
-# N8N + Ngrok Starter Kit
+# Tunn8n - N8N + Ngrok Docker Starter
 
-A complete starter kit to run n8n (workflow automation tool) with Docker and expose it to the internet using Ngrok with custom domain.
+A complete CLI tool to create and manage n8n (workflow automation) with Docker and expose it to the internet using Ngrok with custom domain.
 
 ## 🚀 Features
 
-- ✅ n8n latest version with Docker
-- ✅ Ngrok integration with custom domain
-- ✅ Secure environment variables handling
-- ✅ Health checks and auto-restart
-- ✅ Persistent data storage
-- ✅ Easy-to-use setup scripts
-- ✅ Multi-platform support (macOS, Windows, Linux)
+- ✅ **Easy CLI Setup** - Create new projects with one command
+- ✅ **n8n latest version** with Docker Compose
+- ✅ **Ngrok integration** with custom domain support
+- ✅ **Secure environment variables** handling
+- ✅ **Health checks** and auto-restart
+- ✅ **Persistent data storage**
+- ✅ **Multi-platform support** (macOS, Windows, Linux)
+- ✅ **Complete CLI interface** for easy management
 
-## 📋 Prerequisites
+## 📦 Installation
 
-- Docker installed
-- Docker Compose installed
-- Ngrok account (free)
-- Ngrok auth token
-- Custom Ngrok domain (optional)
-
-## 🛠️ Installation
-
-### 1. Install Docker
-
-**macOS:**
+### Method 1: Install via npm (Recommended)
 
 ```bash
-# Using Homebrew
-brew install --cask docker
+# Install globally
+npm install -g tunn8n
 
-# Or download from: https://docs.docker.com/desktop/install/mac-install/
+# Verify installation
+tunn8n --version
 ```
 
-**Windows:**
-
-- Download Docker Desktop from: https://docs.docker.com/desktop/install/windows-install/
-- Enable WSL 2 if using Windows 10/11
-
-**Linux (Ubuntu/Debian):**
+### Method 2: Manual Setup (if preferred)
 
 ```bash
-# Install Docker
-curl -fsSL https://get.docker.com -o get-docker.sh
-sudo sh get-docker.sh
-
-# Install Docker Compose
-sudo apt-get update
-sudo apt-get install docker-compose-plugin
-```
-
-### 2. Install Ngrok (Optional - for local development)
-
-**macOS:**
-
-```bash
-# Using Homebrew
-brew install ngrok
-
-# Or download from: https://ngrok.com/download
-```
-
-**Windows:**
-
-- Download ngrok from: https://ngrok.com/download
-- Extract and add to PATH or run from download directory
-
-**Linux:**
-
-```bash
-# Using curl
-curl -s https://ngrok-agent.s3.amazonaws.com/ngrok.asc | sudo tee /etc/apt/trusted.gpg.d/ngrok.asc >/dev/null
-echo "deb https://ngrok-agent.s3.amazonaws.com buster main" | sudo tee /etc/apt/sources.list.d/ngrok.list
-sudo apt update
-sudo apt install ngrok
-
-# Alternative method
-wget https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-amd64.tgz
-tar -xzf ngrok-v3-stable-linux-amd64.tgz
-sudo mv ngrok /usr/local/bin/
-```
-
-### 3. Get Ngrok Auth Token
-
-1. Sign up at https://ngrok.com/
-2. Go to https://dashboard.ngrok.com/get-started/your-authtoken
-3. Copy your authtoken
-
-### 4. Setup Project
-
-```bash
-# Clone or download the project
+# Clone the repository
 git clone <your-repo-url>
-cd n8n-ngrok-starter
+cd tunn8n
 
-# Create .env file from template
-cp .env.example .env
+# Install dependencies
+npm install
+
+# Link for local development
+npm link
 ```
 
-## 🔧 Configuration
+## 🚀 Quick Start
 
-### Environment Setup
+### 1. Create a New Project
+
+```bash
+# Create new n8n project
+tunn8n create my-automation-project
+
+# Navigate to project
+cd my-automation-project
+```
+
+### 2. Initialize Environment
+
+```bash
+# Setup environment configuration
+tunn8n init
+
+# Edit .env file with your settings
+nano .env  # or use your favorite editor
+```
+
+### 3. Configure Environment
 
 Edit the `.env` file:
 
 ```env
-# ================================
 # Ngrok Configuration
-# ================================
-# Your Ngrok authentication token (get it from https://dashboard.ngrok.com/get-started/your-authtoken)
-NGROK_AUTHTOKEN=
+NGROK_AUTHTOKEN=your_ngrok_auth_token_here
+NGROK_DOMAIN=your_custom_domain.ngrok-free.app  # Optional for paid plans
 
-# Optional: Set custom domain from Ngrok (only for paid plans)
-NGROK_DOMAIN=
-
-# ================================
 # n8n Configuration
-# ================================
-# Public webhook URL (your ngrok URL will be something like: https://xxxx-xx-xx-xxx-xx.ngrok-free.app)
-WEBHOOK_URL=xxxx-xx-xx-xxx-xx.ngrok-free.app
-
-# Timezone setting (default: Asia/Jakarta)
+WEBHOOK_URL=your_ngrok_url
 TZ=Asia/Jakarta
 
-# Optional: Enable Basic Auth for n8n (recommended for security)
+# Optional: Basic Auth (recommended)
 # N8N_BASIC_AUTH_USER=admin
-# N8N_BASIC_AUTH_PASSWORD=your_secure_password
+# N8N_BASIC_AUTH_PASSWORD=secure_password_here
 ```
 
-**⚠️ IMPORTANT: NEVER commit `.env` file to version control!**
+**⚠️ IMPORTANT:** Get your Ngrok auth token from [Ngrok Dashboard](https://dashboard.ngrok.com/get-started/your-authtoken)
+
+### 4. Start Services
 
 ```bash
-echo ".env" >> .gitignore
+# Start n8n with Ngrok tunnel
+tunn8n start
 ```
 
-### Alternative: Export Variables Directly
+## 🛠️ CLI Commands
 
-If you prefer not to use `.env` file:
+### Project Management
 
 ```bash
-export NGROK_AUTHTOKEN=your_actual_ngrok_token_here
-export NGROK_DOMAIN=quick-ant-officially.ngrok-free.app
+# Create new project
+tunn8n create <project-name>
+
+# Initialize environment
+tunn8n init
+
+# Update to latest version
+tunn8n update
 ```
 
-## 🚀 How to Run
-
-### Method 1: Using Setup Script (Recommended)
+### Service Control
 
 ```bash
-# Make scripts executable
-chmod +x setup.sh start.sh debug.sh check-status.sh
+# Start all services
+tunn8n start
 
-# Run setup
-./setup.sh
+# Check service status
+tunn8n status
+
+# View debug information and logs
+tunn8n debug
 ```
 
-### Method 2: Using Docker Compose Directly
+### Information
 
 ```bash
-# With .env file
+# Show version
+tunn8n --version
+
+# Show help
+tunn8n --help
+```
+
+## 📋 Prerequisites
+
+### Required Software
+
+- **Docker** - [Install Guide](https://docs.docker.com/get-docker/)
+- **Docker Compose** - Usually included with Docker Desktop
+- **Node.js** (v14+) - Only required for CLI tool
+
+### Ngrok Setup
+
+1. Create free account at [ngrok.com](https://ngrok.com/)
+2. Get your auth token from [dashboard](https://dashboard.ngrok.com/get-started/your-authtoken)
+3. (Optional) Reserve custom domain for paid plans
+
+## 🔧 Manual Docker Commands
+
+If you prefer using Docker directly:
+
+```bash
+# Start services
 docker-compose up -d
 
-# Or with exported variables
-NGROK_AUTHTOKEN=your_token docker-compose up -d
-```
-
-### Method 3: Manual Setup
-
-```bash
-# Clean previous containers
+# Stop services
 docker-compose down
 
-# Build and start
-docker-compose up --build -d
-
-# Follow logs
+# View logs
 docker-compose logs -f
+
+# Check status
+docker-compose ps
 ```
 
-## 📊 Status Monitoring
+## 🌐 Access Points
 
-### Check Container Status
+After starting services:
+
+- **Local n8n Access**: http://localhost:5678
+- **Remote Access**: Your Ngrok URL (shown in logs)
+- **Ngrok Dashboard**: http://localhost:4040
+
+## 📊 Monitoring
+
+### Check Service Status
 
 ```bash
-# View all containers status
+tunn8n status
+
+# Or manually
 docker-compose ps
-
-# View Docker processes
-docker ps
-
-# View detailed information
 docker stats
 ```
 
-### Monitor Logs
+### View Logs
 
 ```bash
-# Real-time logs
-docker-compose logs -f
+tunn8n debug
 
-# n8n logs only
-docker logs n8n-app -f --tail 50
-
-# Ngrok logs only
-docker logs n8n-ngrok -f --tail 50
+# Or follow specific logs
+docker-compose logs -f n8n-app
+docker-compose logs -f n8n-ngrok
 ```
 
-### Check Ngrok Tunnel
-
-```bash
-# Check tunnel status
-docker exec n8n-ngrok curl -s http://localhost:4040/api/tunnels | jq
-
-# Get public URL
-docker exec n8n-ngrok curl -s http://localhost:4040/api/tunnels | grep -o '"public_url":"[^"]*' | grep 'https' | head -1
-```
-
-## ⚡ Quick Commands
-
-### Start Services
-
-```bash
-docker-compose up -d
-```
-
-### Stop Services
-
-```bash
-docker-compose down
-```
-
-### Restart Services
-
-```bash
-docker-compose restart
-```
-
-### Force Rebuild
-
-```bash
-docker-compose up -d --build --force-recreate
-```
-
-### Clean Everything
-
-```bash
-docker-compose down -v
-docker volume prune -f
-docker system prune -f
-```
-
-## 🛑 How to Stop
+## 🛑 Stopping Services
 
 ### Graceful Shutdown
 
 ```bash
-# Stop containers but keep data
+# Using CLI
+# (Stop from project directory)
+
+# Using Docker directly
 docker-compose down
-
-# Stop and remove volumes (data will be lost)
-docker-compose down -v
-```
-
-### Emergency Stop
-
-```bash
-# Force stop all containers
-docker stop n8n-app n8n-ngrok
-
-# Remove containers
-docker rm n8n-app n8n-ngrok
 ```
 
 ### Complete Cleanup
 
 ```bash
-# Remove containers, volumes, networks
-docker-compose down -v --rmi all
+# Remove everything (including volumes)
+docker-compose down -v
 
 # Clean Docker system
-docker system prune -af
-docker volume prune -f
+docker system prune -f
 ```
 
 ## 🔍 Troubleshooting
 
 ### Common Issues
 
-1. **Port Already in Use**
+1. **Port 5678 already in use**
 
    ```bash
-   # Check processes using port
-   lsof -i :5678
-
-   # Alternative check
-   netstat -tulpn | grep :5678
+   # Change port in docker-compose.yml
+   ports:
+     - "5679:5678"  # host:container
    ```
-2. **Ngrok Authentication Error**
+2. **Ngrok authentication errors**
+
+   - Verify `NGROK_AUTHTOKEN` in `.env` file
+   - Check token at [Ngrok Dashboard](https://dashboard.ngrok.com/get-started/your-authtoken)
+3. **Docker permission issues** (Linux)
 
    ```bash
-   # Verify token
-   echo $NGROK_AUTHTOKEN
-
-   # Test ngrok token
-   docker run --rm -it -e NGROK_AUTHTOKEN=$NGROK_AUTHTOKEN ngrok/ngrok:latest version
-   ```
-3. **n8n Not Starting**
-
-   ```bash
-   # Debug n8n container
-   docker logs n8n-app --tail 100
-
-   # Execute into container
-   docker exec -it n8n-app sh
-   ```
-4. **Permission Issues (Linux)**
-
-   ```bash
-   # Add user to docker group
    sudo usermod -aG docker $USER
    newgrp docker
    ```
 
-### Debug Scripts
+### Debug Commands
 
 ```bash
-# Run debug script
-./debug.sh
+# Check Ngrok tunnel status
+docker exec n8n-ngrok curl -s http://localhost:4040/api/tunnels | jq
 
-# Check detailed status
-./check-status.sh
-
-# Health check
+# Test n8n health
 curl http://localhost:5678/healthz
+
+# View container logs
+docker logs n8n-app --tail 50
 ```
 
 ## 📁 Project Structure
 
 ```
-n8n-ngrok-starter/
+my-automation-project/
 ├── docker-compose.yml      # Docker compose configuration
-├── .env.example           # Environment variables template
+├── .env                    # Environment variables (created by tunn8n init)
+├── .env.example           # Environment template
 ├── start.sh               # Start services script
 ├── debug.sh               # Debugging utilities
 ├── check-status.sh        # Status monitoring script
 ├── .gitignore            # Git ignore rules
-├── .dockerignore             # Docker ignore rules
-└── README.md             # This documentation
+└── README.md             # Project documentation
 ```
 
-## 🌐 Access Points
+## 🔒 Security Notes
 
-- **n8n Local Access**: http://localhost:5678
-- **n8n Remote Access**: https://quick-ant-officially.ngrok-free.app
-- **Ngrok Dashboard**: http://localhost:4040 (when running locally)
-
-## 🔒 Security Considerations
-
-1. **NEVER** expose `.env` file publicly
+1. **Never commit `.env` file** to version control
 2. Use strong passwords for basic authentication
 3. Regularly rotate Ngrok authentication tokens
 4. Monitor access logs frequently
-5. Consider using VPN or private network for production
-6. Enable HTTPS only in production environments
+5. Consider VPN for production use
 
-## 📞 Support & Resources
-
-If you encounter issues:
-
-1. **Check Logs**: `docker-compose logs`
-2. **Verify Ngrok Token**: https://dashboard.ngrok.com/get-started/your-authtoken
-3. **n8n Documentation**: https://docs.n8n.io/
-4. **Docker Documentation**: https://docs.docker.com/
-5. **Ngrok Documentation**: https://ngrok.com/docs
+## 📞 Support
 
 ### Useful Links
 
-- [n8n Official Documentation](https://docs.n8n.io/)
+- [n8n Documentation](https://docs.n8n.io/)
+- [Docker Documentation](https://docs.docker.com/)
+- [Ngrok Documentation](https://ngrok.com/docs)
 - [Docker Installation Guide](https://docs.docker.com/get-docker/)
-- [Ngrok Dashboard](https://dashboard.ngrok.com/)
-- [Docker Compose Reference](https://docs.docker.com/compose/reference/)
 
-## 🐛 Common Solutions
+### Getting Help
 
-### Docker Daemon Not Running
+1. Check logs: `tunn8n debug`
+2. Verify Ngrok token is correct
+3. Ensure Docker is running
+4. Check port availability
+
+## 🎯 Example Usage
 
 ```bash
-# Start Docker daemon (macOS/Windows)
-open -a Docker  # macOS
-# Or start Docker Desktop application
+# Complete workflow example
+tunn8n create my-n8n-project
+cd my-n8n-project
+tunn8n init
 
-# Linux (systemd)
-sudo systemctl start docker
-sudo systemctl enable docker
+# Edit .env with your Ngrok token
+nano .env
+
+tunn8n start
+tunn8n status
+
+# When done working
+docker-compose down
 ```
-
-### Port Conflicts
-
-Change the port in `docker-compose.yml`:
-
-```yaml
-ports:
-  - "8080:5678"  # host_port:container_port
-```
-
-### Memory Issues
-
-Increase Docker memory allocation in Docker Desktop settings (Preferences → Resources).
 
 ## 📝 License
 
@@ -416,4 +309,4 @@ MIT License - feel free to use this project for your automation needs!
 
 **Happy Automating!** 🚀
 
-*For additional help, create an issue in the project repository or check the troubleshooting section above.*
+*For issues and contributions, please check the project repository.*
