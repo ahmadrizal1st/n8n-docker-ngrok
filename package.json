@@ -1,6 +1,6 @@
 {
   "name": "tunn8n",
-  "version": "1.0.0",
+  "version": "1.1.2",
   "description": "🚀 A production-ready template to kickstart your n8n automation workflows with Docker and Ngrok. This template provides a isolated, containerized environment for n8n with secure, instant tunneling for local development and testing webhooks.",
   "keywords": [
     "n8n",
@@ -23,7 +23,20 @@
   "author": "Ahmad Rizal",
   "type": "commonjs",
   "main": "index.js",
+  "bin": {
+    "tunn8n": "./bin/tunn8n.js"
+  },
+  "files": [
+    "bin/",
+    "templates/",
+    "scripts/",
+    "README.md"
+  ],
   "scripts": {
-    "test": "./status.sh --test"
+    "test": "./scripts/status.sh --test",
+    "prepublishOnly": "chmod +x bin/tunn8n.js && chmod +x scripts/*.sh"
+  },
+  "engines": {
+    "node": ">=14.0.0"
   }
 }

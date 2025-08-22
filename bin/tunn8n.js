@@ -5,39 +5,104 @@ const { execSync } = require("child_process");
 const chalk = require("chalk");
 const fs = require("fs");
 const path = require("path");
-const { spawn } = require("child_process");
 
-// Function to set execute permissions on scripts
-function setScriptPermissions() {
-  const scripts = ["start.sh", "stop.sh", "debug.sh", "status.sh"];
+// Get package installation path
+const PACKAGE_ROOT = path.join(__dirname, "..");
+const TEMPLATES_DIR = path.join(PACKAGE_ROOT, "templates");
+const SCRIPTS_DIR = path.join(PACKAGE_ROOT, "scripts");
 
-  scripts.forEach((script) => {
-    if (fs.existsSync(script)) {
+// Function to get package version from package.json
+function getPackageVersion() {
+  try {
+    const packageJsonPath = path.join(PACKAGE_ROOT, "package.json");
+    const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf8"));
+    return packageJson.version;
+  } catch (error) {
+    return "1.1.2";
+  }
+}
+
+// Function to copy template files from package to project
+function copyTemplateFiles(projectName) {
+  const targetDir = path.join(process.cwd(), projectName);
+
+  if (!fs.existsSync(TEMPLATES_DIR)) {
+    throw new Error("Templates directory not found in package!");
+  }
+
+  const templateFiles = fs.readdirSync(TEMPLATES_DIR);
+
+  templateFiles.forEach((file) => {
+    const sourcePath = path.join(TEMPLATES_DIR, file);
+    const targetPath = path.join(targetDir, file);
+
+    if (fs.existsSync(sourcePath)) {
+      fs.copyFileSync(sourcePath, targetPath);
+      console.log(chalk.green(`✓ Created ${file}`));
+    }
+  });
+}
+
+// Function to copy and set permissions on script files
+function copyScriptFiles(projectName) {
+  const targetDir = path.join(process.cwd(), projectName);
+
+  if (!fs.existsSync(SCRIPTS_DIR)) {
+    throw new Error("Scripts directory not found in package!");
+  }
+
+  const scriptFiles = fs.readdirSync(SCRIPTS_DIR);
+
+  scriptFiles.forEach((file) => {
+    const sourcePath = path.join(SCRIPTS_DIR, file);
+    const targetPath = path.join(targetDir, file);
+
+    if (fs.existsSync(sourcePath)) {
+      fs.copyFileSync(sourcePath, targetPath);
+
+      // Set execute permissions
       try {
-        fs.chmodSync(script, "755");
-        console.log(chalk.gray(`✓ Set execute permissions on ${script}`));
+        fs.chmodSync(targetPath, "755");
+        console.log(chalk.green(`✓ Created and set permissions on ${file}`));
       } catch (error) {
+        console.log(chalk.green(`✓ Created ${file}`));
         console.log(
-          chalk.yellow(
-            `Note: Could not set permissions on ${script}: ${error.message}`
-          )
+          chalk.yellow(`Note: Could not set execute permissions on ${file}`)
         );
       }
     }
   });
 }
 
+// Function to execute script from current directory
+function executeScript(scriptName) {
+  const scriptPath = path.join(process.cwd(), scriptName);
+
+  if (!fs.existsSync(scriptPath)) {
+    throw new Error(`${scriptName} not found in current directory!`);
+  }
+
+  // Ensure script has execute permissions
+  try {
+    fs.chmodSync(scriptPath, "755");
+  } catch (error) {
+    console.log(
+      chalk.yellow(`Warning: Could not set permissions on ${scriptName}`)
+    );
+  }
+
+  execSync(`./${scriptName}`, { stdio: "inherit" });
+}
+
 program
-  .version("1.0.0")
+  .version(getPackageVersion())
   .description("Tunn8n - Local n8n with Docker and ngrok integration");
 
 program
   .command("create <project-name>")
   .description("Create a new tunn8n project from template")
-  .option("-t, --template <template>", "Template version to use", "latest")
-  .action((projectName, options) => {
+  .action((projectName) => {
     console.log(chalk.blue(`Creating new tunn8n project: ${projectName}`));
-    console.log(chalk.gray(`Using template: ${options.template}`));
 
     try {
       // Check if directory already exists
@@ -57,52 +122,19 @@ program
       fs.mkdirSync(projectName, { recursive: true });
       console.log(chalk.green(`✓ Created project directory: ${projectName}`));
 
-      // Copy template files
-      const templateFiles = [
-        "docker-compose.yml",
-        ".env.example",
-        ".gitignore",
-        "README.md",
-      ];
+      // Copy template files from package templates directory
+      copyTemplateFiles(projectName);
 
-      templateFiles.forEach((file) => {
-        const sourcePath = path.join(__dirname, file);
-        const targetPath = path.join(projectName, file);
-
-        if (fs.existsSync(sourcePath)) {
-          fs.copyFileSync(sourcePath, targetPath);
-          console.log(chalk.green(`✓ Created ${file}`));
-        }
-      });
-
-      // Copy script files and set permissions
-      const scriptFiles = ["start.sh", "stop.sh", "debug.sh", "status.sh"];
-
-      scriptFiles.forEach((file) => {
-        const sourcePath = path.join(__dirname, file);
-        const targetPath = path.join(projectName, file);
-
-        if (fs.existsSync(sourcePath)) {
-          fs.copyFileSync(sourcePath, targetPath);
-
-          // Set execute permissions on the script
-          try {
-            fs.chmodSync(targetPath, "755");
-            console.log(
-              chalk.green(`✓ Created and set permissions on ${file}`)
-            );
-          } catch (error) {
-            console.log(chalk.green(`✓ Created ${file}`));
-            console.log(
-              chalk.yellow(`Note: Could not set execute permissions on ${file}`)
-            );
-          }
-        }
-      });
+      // Copy script files from package scripts directory
+      copyScriptFiles(projectName);
 
       // Create .env from .env.example
-      const envExamplePath = path.join(projectName, ".env.example");
-      const envFilePath = path.join(projectName, ".env");
+      const envExamplePath = path.join(
+        process.cwd(),
+        projectName,
+        ".env.example"
+      );
+      const envFilePath = path.join(process.cwd(), projectName, ".env");
 
       if (fs.existsSync(envExamplePath)) {
         fs.copyFileSync(envExamplePath, envFilePath);
@@ -113,7 +145,6 @@ program
       console.log(chalk.yellow("\nNext steps:"));
       console.log(chalk.cyan(`  cd ${projectName}`));
       console.log(chalk.cyan("  # Edit .env file with your configuration"));
-      console.log(chalk.cyan("  tunn8n init    # Initialize environment"));
       console.log(chalk.cyan("  tunn8n start   # Start services"));
       console.log(chalk.cyan("  tunn8n status  # Check service status"));
     } catch (error) {
@@ -132,14 +163,11 @@ program
       if (!fs.existsSync(".env")) {
         console.log(chalk.yellow("Warning: .env file not found!"));
         console.log(
-          chalk.yellow("Run 'tunn8n init' first or create .env manually")
+          chalk.yellow("Please create .env file from .env.example first")
         );
       }
 
-      // Set execute permissions on scripts before running
-      setScriptPermissions();
-
-      execSync("./start.sh", { stdio: "inherit" });
+      executeScript("start.sh");
       console.log(chalk.green("✓ Services started successfully!"));
     } catch (error) {
       console.log(chalk.red("Error starting tunn8n:"), error.message);
@@ -153,36 +181,16 @@ program
 
 program
   .command("stop")
-  .description("Stop all Docker containers for tunn8n project using stop.sh")
+  .description("Stop all Docker containers for tunn8n project")
   .action(() => {
     console.log(chalk.blue("Stopping tunn8n services..."));
     try {
-      // Set execute permissions on scripts before running
-      setScriptPermissions();
-
-      // Check if stop.sh exists
-      if (!fs.existsSync("stop.sh")) {
-        console.log(
-          chalk.yellow("stop.sh not found, using docker-compose directly...")
-        );
-        // Fallback to direct docker-compose command
-        execSync("docker-compose down", { stdio: "inherit" });
-        console.log(chalk.green("✓ Services stopped successfully!"));
-        return;
-      }
-
-      // Execute the stop.sh script
-      execSync("./stop.sh", { stdio: "inherit" });
+      executeScript("stop.sh");
       console.log(chalk.green("✓ Services stopped successfully!"));
     } catch (error) {
       console.log(chalk.red("Error stopping tunn8n:"), error.message);
-      console.log(
-        chalk.yellow(
-          "Make sure Docker is running and you have proper permissions"
-        )
-      );
 
-      // Fallback to direct docker command if stop.sh fails
+      // Fallback to direct docker command
       try {
         console.log(
           chalk.yellow("Trying fallback method with docker-compose...")
@@ -204,10 +212,7 @@ program
   .action(() => {
     console.log(chalk.blue("Running debug utilities..."));
     try {
-      // Set execute permissions on scripts before running
-      setScriptPermissions();
-
-      execSync("./debug.sh", { stdio: "inherit" });
+      executeScript("debug.sh");
     } catch (error) {
       console.log(chalk.red("Error running debug:"), error.message);
     }
@@ -219,10 +224,7 @@ program
   .action(() => {
     console.log(chalk.blue("Checking service status..."));
     try {
-      // Set execute permissions on scripts before running
-      setScriptPermissions();
-
-      execSync("./status.sh", { stdio: "inherit" });
+      executeScript("status.sh");
     } catch (error) {
       console.log(chalk.red("Error checking status:"), error.message);
     }
@@ -268,7 +270,7 @@ program
   .command("version")
   .description("Show tunn8n version information")
   .action(() => {
-    console.log(chalk.blue("tunn8n CLI Version: 1.0.0"));
+    console.log(chalk.blue(`tunn8n CLI Version: ${getPackageVersion()}`));
     console.log(chalk.gray("Template: n8n with Docker + Ngrok integration"));
   });
 
@@ -278,9 +280,6 @@ if (process.argv.length === 2) {
   console.log(chalk.yellow("\nExample usage:"));
   console.log(
     chalk.cyan("  tunn8n create my-project     # Create new project")
-  );
-  console.log(
-    chalk.cyan("  tunn8n init                 # Initialize environment")
   );
   console.log(chalk.cyan("  tunn8n start                # Start services"));
   console.log(chalk.cyan("  tunn8n stop                 # Stop services"));
