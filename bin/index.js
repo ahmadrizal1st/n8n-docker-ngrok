@@ -4,9 +4,69 @@ const { execSync } = require("child_process");
 const fs = require("fs");
 const path = require("path");
 
+// Define colors and symbols for the header
+const COLORS = {
+  BLUE: "\x1b[34m",
+  WHITE: "\x1b[37m",
+  CYAN: "\x1b[36m",
+  PINK: "\x1b[35m",
+  LIGHT_BLUE: "\x1b[94m",
+  NC: "\x1b[0m", // No Color
+};
+
+const CORNER_TL = "╔";
+const CORNER_TR = "╗";
+const CORNER_BL = "╚";
+const CORNER_BR = "╝";
+const LINE_H = "═";
+const LINE_V = "║";
+
+// Function to print the header
+function printHeader() {
+  console.clear();
+
+  // Row 1 - T U N N 8 N
+  console.log(
+    `${COLORS.BLUE}  ████████╗${COLORS.WHITE}██╗   ██╗${COLORS.BLUE}███╗   ██╗${COLORS.CYAN}███╗   ██╗${COLORS.PINK}  █████╗  ${COLORS.CYAN}███╗   ██╗${COLORS.NC}`
+  );
+
+  // Row 2 - T U N N 8 N
+  console.log(
+    `${COLORS.BLUE}  ╚══██╔══╝${COLORS.WHITE}██║   ██║${COLORS.BLUE}████╗  ██║${COLORS.CYAN}████╗  ██║${COLORS.PINK} ██╔══██╗ ${COLORS.CYAN}████╗  ██║${COLORS.NC}`
+  );
+
+  // Row 3 - T U N N 8 N
+  console.log(
+    `${COLORS.BLUE}     ██║   ${COLORS.WHITE}██║   ██║${COLORS.BLUE}██╔██╗ ██║${COLORS.CYAN}██╔██╗ ██║${COLORS.PINK}  █████║  ${COLORS.CYAN}██╔██╗ ██║${COLORS.NC}`
+  );
+
+  // Row 4 - T U N N 8 N
+  console.log(
+    `${COLORS.BLUE}     ██║   ${COLORS.WHITE}██║   ██║${COLORS.BLUE}██║╚██╗██║${COLORS.CYAN}██║╚██╗██║${COLORS.PINK} ██║  ██║ ${COLORS.CYAN}██║╚██╗██║${COLORS.NC}`
+  );
+
+  // Row 5 - T U N N 8 N
+  console.log(
+    `${COLORS.BLUE}     ██║   ${COLORS.WHITE}╚██████╔╝${COLORS.BLUE}██║ ╚████║${COLORS.CYAN}██║ ╚████║${COLORS.PINK} ╚█████╔╝ ${COLORS.CYAN}██║ ╚████║${COLORS.NC}`
+  );
+
+  // Row 6 - T U N N 8 N
+  console.log(
+    `${COLORS.BLUE}     ╚═╝    ${COLORS.WHITE}╚═════╝ ${COLORS.BLUE}╚═╝  ╚═══╝${COLORS.CYAN}╚═╝  ╚═══╝${COLORS.PINK}  ╚════╝  ${COLORS.CYAN}╚═╝  ╚═══╝${COLORS.NC}`
+  );
+
+  console.log(`${COLORS.NC}`);
+  console.log(
+    `${COLORS.LIGHT_BLUE}${CORNER_TL}${LINE_H.repeat(34)}${CORNER_TR}`
+  );
+  console.log(`${LINE_V}    Docker Tunnel Management System    ${LINE_V}`);
+  console.log(`${CORNER_BL}${LINE_H.repeat(34)}${CORNER_BR}`);
+  console.log(`${COLORS.NC}`);
+}
+
 // Get package installation path
 const PACKAGE_ROOT = path.join(__dirname, "..");
-const SCRIPTS_DIR = path.join(PACKAGE_ROOT, "scripts");
+const TEMPLATES_DIR = path.join(PACKAGE_ROOT, "templates");
 
 // Simple color functions replacement for chalk
 const colors = {
@@ -26,7 +86,7 @@ function getPackageVersion() {
     const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf8"));
     return packageJson.version;
   } catch (error) {
-    return "1.1.15";
+    return "1.3.7";
   }
 }
 
@@ -55,35 +115,186 @@ function checkDockerCompose() {
   }
 }
 
+// Function to copy template files from package to project
+function copyTemplateFiles(projectName) {
+  const targetDir = path.join(process.cwd(), projectName);
+
+  if (!fs.existsSync(TEMPLATES_DIR)) {
+    throw new Error("Templates directory not found in package!");
+  }
+
+  const templateFiles = fs.readdirSync(TEMPLATES_DIR);
+
+  templateFiles.forEach((file) => {
+    const sourcePath = path.join(TEMPLATES_DIR, file);
+    const targetPath = path.join(targetDir, file);
+
+    if (fs.existsSync(sourcePath)) {
+      // If it's a directory, copy recursively
+      if (fs.statSync(sourcePath).isDirectory()) {
+        copyRecursiveSync(sourcePath, targetPath);
+      } else {
+        fs.copyFileSync(sourcePath, targetPath);
+      }
+      console.log(colors.green(`✓ Created ${file}`));
+    }
+  });
+
+  // Create .gitignore if it doesn't exist in templates
+  createGitignore(projectName);
+}
+
+// Function to copy root files (package.json and README.md) to project
+function copyRootFiles(projectName) {
+  const targetDir = path.join(process.cwd(), projectName);
+
+  // Copy package.json
+  const packageJsonPath = path.join(PACKAGE_ROOT, "package.json");
+  const targetPackageJsonPath = path.join(targetDir, "package.json");
+
+  if (fs.existsSync(packageJsonPath)) {
+    try {
+      // Salin langsung file package.json tanpa modifikasi
+      fs.copyFileSync(packageJsonPath, targetPackageJsonPath);
+      console.log(colors.green("✓ Created package.json"));
+    } catch (error) {
+      console.log(colors.yellow("Could not copy package.json:"), error.message);
+    }
+  }
+
+  // Copy README.md
+  const readmePath = path.join(PACKAGE_ROOT, "README.md");
+  const targetReadmePath = path.join(targetDir, "README.md");
+
+  if (fs.existsSync(readmePath)) {
+    try {
+      fs.copyFileSync(readmePath, targetReadmePath);
+      console.log(colors.green("✓ Created README.md"));
+    } catch (error) {
+      console.log(colors.yellow("Could not copy README.md:"), error.message);
+    }
+  }
+}
+
+// Recursive copy function for directories
+function copyRecursiveSync(src, dest) {
+  if (!fs.existsSync(dest)) {
+    fs.mkdirSync(dest, { recursive: true });
+  }
+
+  const items = fs.readdirSync(src);
+
+  items.forEach((item) => {
+    const srcPath = path.join(src, item);
+    const destPath = path.join(dest, item);
+
+    if (fs.statSync(srcPath).isDirectory()) {
+      copyRecursiveSync(srcPath, destPath);
+    } else {
+      fs.copyFileSync(srcPath, destPath);
+    }
+  });
+}
+
+// Function to create .gitignore file
+function createGitignore(projectName) {
+  const targetDir = path.join(process.cwd(), projectName);
+  const gitignorePath = path.join(targetDir, ".gitignore");
+
+  // Check if .gitignore already exists
+  if (fs.existsSync(gitignorePath)) {
+    console.log(colors.gray(".gitignore already exists"));
+    return;
+  }
+
+  // Default .gitignore content for n8n Docker project
+  const gitignoreContent = `# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment variables
+.env
+.env.local
+.env.production
+
+# Logs
+logs
+*.log
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+
+# Docker volumes and data
+data/
+docker-data/
+volumes/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary folders
+tmp/
+temp/
+
+# n8n specific
+n8n/
+n8n_public/
+
+# Ngrok (if used)
+ngrok.yml
+
+# Docker compose override
+docker-compose.override.yml
+`;
+
+  try {
+    fs.writeFileSync(gitignorePath, gitignoreContent);
+    console.log(colors.green("✓ Created .gitignore with default content"));
+  } catch (error) {
+    console.log(colors.yellow("Could not create .gitignore:"), error.message);
+  }
+}
+
 // Function to execute script with dynamic path detection
-function executeScript(scriptName, args = []) {
+function executeScript(scriptName) {
   let scriptPath;
   let scriptCommand;
 
-  // Check in package scripts directory first
-  const packageScriptPath = path.join(SCRIPTS_DIR, scriptName);
-  const localScriptsPath = path.join(process.cwd(), "scripts", scriptName);
+  // Check in scripts directory first
+  const scriptsDirPath = path.join(process.cwd(), "scripts", scriptName);
   const rootPath = path.join(process.cwd(), scriptName);
 
-  if (fs.existsSync(packageScriptPath)) {
-    scriptPath = packageScriptPath;
-    scriptCommand = `"${packageScriptPath}"`;
-  } else if (fs.existsSync(localScriptsPath)) {
-    scriptPath = localScriptsPath;
-    scriptCommand = `./scripts/${scriptName}`;
+  if (fs.existsSync(scriptsDirPath)) {
+    scriptPath = scriptsDirPath;
+    scriptCommand = `node ./scripts/${scriptName}`; // Changed to use node for JS files
   } else if (fs.existsSync(rootPath)) {
     scriptPath = rootPath;
-    scriptCommand = `./${scriptName}`;
+    scriptCommand = `node ./${scriptName}`; // Changed to use node for JS files
     console.log(
       colors.yellow(
         `Warning: Running ${scriptName} from root directory (scripts/ preferred)`
       )
     );
   } else {
-    throw new Error(`${scriptName} not found!`);
+    throw new Error(`${scriptName} not found in scripts/ or root directory!`);
   }
 
-  // Ensure script has execute permissions
+  // Ensure script has execute permissions (optional for JS files but kept)
   try {
     fs.chmodSync(scriptPath, "755");
   } catch (error) {
@@ -92,9 +303,7 @@ function executeScript(scriptName, args = []) {
     );
   }
 
-  // Execute script with arguments
-  const fullCommand = `${scriptCommand} ${args.join(" ")}`;
-  execSync(fullCommand, { stdio: "inherit", cwd: process.cwd() });
+  execSync(scriptCommand, { stdio: "inherit", cwd: process.cwd() });
 }
 
 // Function to validate environment variables
@@ -141,12 +350,12 @@ ${colors.bold("Usage:")}
   tunn8n --help                Show this help message
 
 ${colors.bold("Project Structure:")}
-  📁 scripts/    - Shell scripts for service management
-  📄 .env        - Environment configuration
   📄 docker-compose.yml - Docker service definitions
-  📄 README.md   - Documentation
   📄 .gitignore  - Git ignore rules
+  📄 .env        - Environment configuration
   📄 .env.example - Example environment configuration
+  📄 README.md   - Documentation
+  📄 package.json - Project metadata and dependencies
 
 ${colors.bold("Examples:")}
   tunn8n create my-automation
@@ -157,6 +366,7 @@ ${colors.bold("Examples:")}
 }
 
 function createProject(projectName) {
+  printHeader();
   console.log(colors.blue(`Creating new tunn8n project: ${projectName}`));
 
   try {
@@ -194,8 +404,42 @@ function createProject(projectName) {
       process.exit(1);
     }
 
-    // Execute the create.sh script with the project name as argument
-    executeScript("create.sh", [projectName]);
+    // Create project directory
+    fs.mkdirSync(projectName, { recursive: true });
+    console.log(colors.green(`✓ Created project directory: ${projectName}`));
+
+    // Copy template files from package templates directory
+    copyTemplateFiles(projectName);
+
+    // Copy root files (package.json and README.md)
+    copyRootFiles(projectName);
+
+    // Create .env from .env.example
+    const envExamplePath = path.join(
+      process.cwd(),
+      projectName,
+      ".env.example"
+    );
+    const envFilePath = path.join(process.cwd(), projectName, ".env");
+
+    if (fs.existsSync(envExamplePath)) {
+      fs.copyFileSync(envExamplePath, envFilePath);
+      console.log(colors.green("✓ Created .env file from template"));
+
+      // Show important environment variables to configure
+      console.log(
+        colors.yellow(
+          "\nImportant: Please configure these environment variables:"
+        )
+      );
+      console.log(
+        colors.cyan(
+          "  - NGROK_AUTH_TOKEN (get from https://dashboard.ngrok.com/get-started/your-authtoken)"
+        )
+      );
+      console.log(colors.cyan("  - N8N_PORT (default: 5678)"));
+      console.log(colors.cyan("  - N8N_PROTOCOL (http or https)"));
+    }
 
     console.log(colors.green("\n🎉 Project created successfully!"));
     console.log(colors.yellow("\nNext steps:"));
@@ -229,7 +473,7 @@ function startService() {
       validateEnvVars();
     }
 
-    executeScript("start.sh");
+    executeScript("start.js"); // Changed from start.sh to start.js
     console.log(colors.green("✓ Services started successfully!"));
   } catch (error) {
     console.log(colors.red("Error starting tunn8n:"), error.message);
@@ -244,7 +488,7 @@ function startService() {
 function stopService() {
   console.log(colors.blue("Stopping tunn8n services..."));
   try {
-    executeScript("stop.sh");
+    executeScript("stop.js"); // Changed from stop.sh to stop.js
     console.log(colors.green("✓ Services stopped successfully!"));
   } catch (error) {
     console.log(colors.red("Error stopping tunn8n:"), error.message);
@@ -274,7 +518,7 @@ function stopService() {
 function debugService() {
   console.log(colors.blue("Running debug utilities..."));
   try {
-    executeScript("debug.sh");
+    executeScript("debug.js"); // Changed from debug.sh to debug.js
   } catch (error) {
     console.log(colors.red("Error running debug:"), error.message);
   }
@@ -283,7 +527,7 @@ function debugService() {
 function statusService() {
   console.log(colors.blue("Checking service status..."));
   try {
-    executeScript("status.sh");
+    executeScript("status.js"); // Changed from status.sh to status.js
   } catch (error) {
     console.log(colors.red("Error checking status:"), error.message);
   }
