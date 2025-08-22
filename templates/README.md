@@ -1,6 +1,6 @@
 # Tunn8n - N8N + Ngrok Docker Starter
 
-A complete CLI tool to create and manage n8n (workflow automation) with Docker and expose it to the internet using Ngrok with custom domain.
+A complete CLI tool to create and manage n8n (workflow automation) with Docker and expose it to the internet using Ngrok with custom domain support.
 
 ## 🚀 Features
 
@@ -12,6 +12,9 @@ A complete CLI tool to create and manage n8n (workflow automation) with Docker a
 - ✅ **Persistent data storage**
 - ✅ **Multi-platform support** (macOS, Windows, Linux)
 - ✅ **Complete CLI interface** for easy management
+- ✅ **Automatic script management** with proper permissions
+- ✅ **Environment validation** and error checking
+- ✅ **Fallback mechanisms** for robust operation
 
 ## 📦 Installation
 
@@ -19,10 +22,11 @@ A complete CLI tool to create and manage n8n (workflow automation) with Docker a
 
 ```bash
 # Install globally
-npm install -g tunn8n
+npm install -g tunn8n@latest
 
 # Verify installation
 tunn8n --version
+tunn8n -v
 ```
 
 ### Method 2: Manual Setup (if preferred)
@@ -32,7 +36,7 @@ tunn8n --version
 git clone <your-repo-url>
 cd tunn8n
 
-# Install dependencies
+# Install dependencies(optional)
 npm install
 
 # Link for local development
@@ -71,6 +75,8 @@ NGROK_AUTHTOKEN=your_ngrok_auth_token_here
 NGROK_DOMAIN=your_custom_domain.ngrok-free.app  # Optional for paid plans
 
 # n8n Configuration
+N8N_PORT=5678
+N8N_PROTOCOL=http
 WEBHOOK_URL=your_ngrok_url
 TZ=Asia/Jakarta
 
@@ -96,7 +102,7 @@ tunn8n start
 # Create new project
 tunn8n create <project-name>
 
-# Initialize environment
+# Initialize environment (create .env from template)
 tunn8n init
 
 # Update to latest version
@@ -118,8 +124,6 @@ tunn8n debug
 # Stop all services
 tunn8n stop
 ```
-
-
 
 ### Information
 
@@ -145,22 +149,20 @@ tunn8n --help
 2. Get your auth token from [dashboard](https://dashboard.ngrok.com/get-started/your-authtoken)
 3. (Optional) Reserve custom domain for paid plans
 
-## 🔧 Manual Docker Commands
+## 🔧 Project Structure
 
-If you prefer using Docker directly:
-
-```bash
-# Start services
-docker-compose up -d
-
-# Stop services
-docker-compose down
-
-# View logs
-docker-compose logs -f
-
-# Check status
-docker-compose ps
+```
+my-automation-project/
+├── scripts/               # Shell scripts for service management
+│   ├── start.sh          # Start services script
+│   ├── stop.sh           # Stop services script  
+│   ├── status.sh         # Status monitoring script
+│   └── debug.sh          # Debugging utilities
+├── docker-compose.yml    # Docker compose configuration
+├── .env                  # Environment variables (created by tunn8n init)
+├── .env.example          # Environment template
+├── .gitignore           # Git ignore rules
+└── README.md            # Project documentation
 ```
 
 ## 🌐 Access Points
@@ -199,7 +201,7 @@ docker-compose logs -f n8n-ngrok
 
 ```bash
 # Using CLI
-# (Stop from project directory)
+tunn8n stop
 
 # Using Docker directly
 docker-compose down
@@ -222,9 +224,8 @@ docker system prune -f
 1. **Port 5678 already in use**
    
    ```bash
-   # Change port in docker-compose.yml
-   ports:
-     - "5679:5678"  # host:container
+   # Change N8N_PORT in .env file
+   N8N_PORT=5679
    ```
 2. **Ngrok authentication errors**
    
@@ -235,6 +236,12 @@ docker system prune -f
    ```bash
    sudo usermod -aG docker $USER
    newgrp docker
+   ```
+4. **Script permission issues**
+   
+   ```bash
+   # Grant execute permissions to scripts
+   chmod +x scripts/*.sh
    ```
 
 ### Debug Commands
@@ -248,20 +255,6 @@ curl http://localhost:5678/healthz
 
 # View container logs
 docker logs n8n-app --tail 50
-```
-
-## 📁 Project Structure
-
-```
-my-automation-project/
-├── docker-compose.yml      # Docker compose configuration
-├── .env                    # Environment variables (created by tunn8n init)
-├── .env.example           # Environment template
-├── start.sh               # Start services script
-├── debug.sh               # Debugging utilities
-├── check-status.sh        # Status monitoring script
-├── .gitignore            # Git ignore rules
-└── README.md             # Project documentation
 ```
 
 ## 🔒 Security Notes
@@ -287,6 +280,7 @@ my-automation-project/
 2. Verify Ngrok token is correct
 3. Ensure Docker is running
 4. Check port availability
+5. Validate environment variables: `tunn8n init` and check `.env` file
 
 ## 🎯 Example Usage
 
@@ -296,7 +290,7 @@ tunn8n create my-n8n-project
 cd my-n8n-project
 tunn8n init
 
-# Edit .env with your Ngrok token
+# Edit .env with your Ngrok token and settings
 nano .env
 
 tunn8n start
@@ -315,4 +309,29 @@ MIT License - feel free to use this project for your automation needs!
 **Happy Automating!** 🚀
 
 *For issues and contributions, please check the project repository.*
+
+## 🔄 Changelog
+
+### Version 1.1.12
+
+- **Enhanced CLI** with better error handling and fallback mechanisms
+- **Automatic script permissions** management
+- **Environment validation** with helpful warnings
+- **Improved project structure** with dedicated scripts directory
+- **Better Docker compatibility** checks
+- **Template-based .env initialization**
+- **Comprehensive .gitignore** for security
+
+### Key Improvements
+
+- ✅ Automatic script permission setting (chmod 755)
+- ✅ Environment variable validation with warnings
+- ✅ Fallback to direct docker commands if scripts fail
+- ✅ Better error messages and user guidance
+- ✅ Template-based project creation with proper structure
+- ✅ Enhanced security with comprehensive .gitignore
+
+---
+
+*Note: This tool automatically handles script permissions and provides fallback mechanisms for robust operation across different environments.*
 
