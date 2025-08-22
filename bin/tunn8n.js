@@ -7,6 +7,26 @@ const fs = require("fs");
 const path = require("path");
 const { spawn } = require("child_process");
 
+// Function to set execute permissions on scripts
+function setScriptPermissions() {
+  const scripts = ["start.sh", "stop.sh", "debug.sh", "status.sh"];
+
+  scripts.forEach((script) => {
+    if (fs.existsSync(script)) {
+      try {
+        fs.chmodSync(script, "755");
+        console.log(chalk.gray(`✓ Set execute permissions on ${script}`));
+      } catch (error) {
+        console.log(
+          chalk.yellow(
+            `Note: Could not set permissions on ${script}: ${error.message}`
+          )
+        );
+      }
+    }
+  });
+}
+
 program
   .version("1.0.0")
   .description("Tunn8n - Local n8n with Docker and ngrok integration");
@@ -55,6 +75,31 @@ program
         }
       });
 
+      // Copy script files and set permissions
+      const scriptFiles = ["start.sh", "stop.sh", "debug.sh", "status.sh"];
+
+      scriptFiles.forEach((file) => {
+        const sourcePath = path.join(__dirname, file);
+        const targetPath = path.join(projectName, file);
+
+        if (fs.existsSync(sourcePath)) {
+          fs.copyFileSync(sourcePath, targetPath);
+
+          // Set execute permissions on the script
+          try {
+            fs.chmodSync(targetPath, "755");
+            console.log(
+              chalk.green(`✓ Created and set permissions on ${file}`)
+            );
+          } catch (error) {
+            console.log(chalk.green(`✓ Created ${file}`));
+            console.log(
+              chalk.yellow(`Note: Could not set execute permissions on ${file}`)
+            );
+          }
+        }
+      });
+
       // Create .env from .env.example
       const envExamplePath = path.join(projectName, ".env.example");
       const envFilePath = path.join(projectName, ".env");
@@ -91,6 +136,9 @@ program
         );
       }
 
+      // Set execute permissions on scripts before running
+      setScriptPermissions();
+
       execSync("./start.sh", { stdio: "inherit" });
       console.log(chalk.green("✓ Services started successfully!"));
     } catch (error) {
@@ -103,13 +151,15 @@ program
     }
   });
 
-// ADDED STOP COMMAND HERE
 program
   .command("stop")
   .description("Stop all Docker containers for tunn8n project using stop.sh")
   .action(() => {
     console.log(chalk.blue("Stopping tunn8n services..."));
     try {
+      // Set execute permissions on scripts before running
+      setScriptPermissions();
+
       // Check if stop.sh exists
       if (!fs.existsSync("stop.sh")) {
         console.log(
@@ -119,16 +169,6 @@ program
         execSync("docker-compose down", { stdio: "inherit" });
         console.log(chalk.green("✓ Services stopped successfully!"));
         return;
-      }
-
-      // Make sure stop.sh is executable
-      try {
-        fs.chmodSync("stop.sh", "755");
-      } catch (chmodError) {
-        // Silently continue if chmod fails
-        console.log(
-          chalk.gray("Note: Could not set execute permissions on stop.sh")
-        );
       }
 
       // Execute the stop.sh script
@@ -164,6 +204,9 @@ program
   .action(() => {
     console.log(chalk.blue("Running debug utilities..."));
     try {
+      // Set execute permissions on scripts before running
+      setScriptPermissions();
+
       execSync("./debug.sh", { stdio: "inherit" });
     } catch (error) {
       console.log(chalk.red("Error running debug:"), error.message);
@@ -176,6 +219,9 @@ program
   .action(() => {
     console.log(chalk.blue("Checking service status..."));
     try {
+      // Set execute permissions on scripts before running
+      setScriptPermissions();
+
       execSync("./status.sh", { stdio: "inherit" });
     } catch (error) {
       console.log(chalk.red("Error checking status:"), error.message);
