@@ -26,7 +26,7 @@ function getPackageVersion() {
     const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf8"));
     return packageJson.version;
   } catch (error) {
-    return "1.1.14";
+    return "1.1.15";
   }
 }
 
