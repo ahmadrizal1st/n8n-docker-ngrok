@@ -3,20 +3,14 @@
 # TUNN8N - Docker Tunnel Manager
 # Simplified version
 
-# Define TUNN8N color palette
-T8N_DARK_BLUE='\033[0;38;5;18m'
-T8N_BLUE='\033[0;38;5;27m'
-T8N_LIGHT_BLUE='\033[0;38;5;39m'
-T8N_CYAN='\033[0;38;5;51m'
-T8N_PURPLE='\033[0;38;5;129m'
-T8N_PINK='\033[0;38;5;205m'
-T8N_GREEN='\033[0;38;5;46m'
-T8N_YELLOW='\033[0;38;5;226m'
-T8N_ORANGE='\033[0;38;5;208m'
-T8N_RED='\033[0;38;5;196m'
-T8N_WHITE='\033[1;38;5;255m'
-T8N_GRAY='\033[0;38;5;245m'
-NC='\033[0m'
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+CYAN='\033[0;36m'
+PURPLE='\033[0;35m'
+NC='\033[0m' # No Color
 
 # Symbols
 CHECK="✓"
@@ -82,21 +76,47 @@ get_ngrok_url() {
 }
 
 main() {
+    # Header
+    echo -e "${BLUE}"
+    echo "╔══════════════════════════════════════════╗"
+    echo "║           TUNN8N DEPLOYMENT              ║"
+    echo "╚══════════════════════════════════════════╝"
+    echo -e "${NC}"
+
+    # Check Docker
+    if ! docker info >/dev/null 2>&1; then
+        echo -e "${RED}❌ Docker is not running${NC}"
+        exit 1
+    else
+        echo -e "${GREEN}✅ Docker is running${NC}"
+    fi
+
     load_env
     
     if deploy_services; then
         print_info "Waiting for services to start..."
         sleep 10
         
-        print_info "Service status:"
+        # Container status
+        echo -e "\n${BLUE}CONTAINER STATUS:${NC}"
         docker ps --filter "name=n8n" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
         
         get_ngrok_url
+        
+        # Summary
+        echo -e "\n${BLUE}SUMMARY:${NC}"
+        if docker ps | grep -q "n8n-app"; then
+            echo -e "${GREEN}✅ n8n-app is running${NC}"
+        else
+            echo -e "${RED}❌ n8n-app is NOT running${NC}"
+        fi
         
         echo
         print_success "Deployment completed!"
         echo -e "${CYAN}Local:  http://localhost:5678${NC}"
         echo -e "${CYAN}Tunnel: $(cat ngrok_url.txt 2>/dev/null || echo 'Check logs')${NC}"
+        
+        echo -e "\n${GREEN}Deployment completed at: $(date)${NC}"
     else
         print_error "Deployment failed"
         exit 1

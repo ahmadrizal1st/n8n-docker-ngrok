@@ -6,7 +6,6 @@ const path = require("path");
 
 // Get package installation path
 const PACKAGE_ROOT = path.join(__dirname, "..");
-const TEMPLATES_DIR = path.join(PACKAGE_ROOT, "templates");
 const SCRIPTS_DIR = path.join(PACKAGE_ROOT, "scripts");
 
 // Simple color functions replacement for chalk
@@ -56,169 +55,21 @@ function checkDockerCompose() {
   }
 }
 
-// Function to copy template files from package to project
-function copyTemplateFiles(projectName) {
-  const targetDir = path.join(process.cwd(), projectName);
-
-  if (!fs.existsSync(TEMPLATES_DIR)) {
-    throw new Error("Templates directory not found in package!");
-  }
-
-  const templateFiles = fs.readdirSync(TEMPLATES_DIR);
-
-  templateFiles.forEach((file) => {
-    const sourcePath = path.join(TEMPLATES_DIR, file);
-    const targetPath = path.join(targetDir, file);
-
-    if (fs.existsSync(sourcePath)) {
-      // If it's a directory, copy recursively
-      if (fs.statSync(sourcePath).isDirectory()) {
-        copyRecursiveSync(sourcePath, targetPath);
-      } else {
-        fs.copyFileSync(sourcePath, targetPath);
-      }
-      console.log(colors.green(`✓ Created ${file}`));
-    }
-  });
-
-  // Create .gitignore if it doesn't exist in templates
-  createGitignore(projectName);
-}
-
-// Recursive copy function for directories
-function copyRecursiveSync(src, dest) {
-  if (!fs.existsSync(dest)) {
-    fs.mkdirSync(dest, { recursive: true });
-  }
-
-  const items = fs.readdirSync(src);
-
-  items.forEach((item) => {
-    const srcPath = path.join(src, item);
-    const destPath = path.join(dest, item);
-
-    if (fs.statSync(srcPath).isDirectory()) {
-      copyRecursiveSync(srcPath, destPath);
-    } else {
-      fs.copyFileSync(srcPath, destPath);
-    }
-  });
-}
-
-// Function to copy script files from package to project
-function copyScriptFiles(projectName) {
-  const targetDir = path.join(process.cwd(), projectName);
-  const scriptsTargetDir = path.join(targetDir, "scripts");
-
-  if (!fs.existsSync(SCRIPTS_DIR)) {
-    throw new Error("Scripts directory not found in package!");
-  }
-
-  // Create scripts directory if it doesn't exist
-  if (!fs.existsSync(scriptsTargetDir)) {
-    fs.mkdirSync(scriptsTargetDir, { recursive: true });
-  }
-
-  const scriptFiles = fs.readdirSync(SCRIPTS_DIR);
-
-  scriptFiles.forEach((file) => {
-    const sourcePath = path.join(SCRIPTS_DIR, file);
-    const targetPath = path.join(scriptsTargetDir, file);
-
-    if (fs.existsSync(sourcePath)) {
-      fs.copyFileSync(sourcePath, targetPath);
-      // Set execute permissions on script files
-      fs.chmodSync(targetPath, "755");
-      console.log(colors.green(`✓ Created scripts/${file}`));
-    }
-  });
-}
-
-// Function to create .gitignore file
-function createGitignore(projectName) {
-  const targetDir = path.join(process.cwd(), projectName);
-  const gitignorePath = path.join(targetDir, ".gitignore");
-
-  // Check if .gitignore already exists
-  if (fs.existsSync(gitignorePath)) {
-    console.log(colors.gray(".gitignore already exists"));
-    return;
-  }
-
-  // Default .gitignore content for n8n Docker project
-  const gitignoreContent = `# Dependencies
-node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# Environment variables
-.env
-.env.local
-.env.production
-
-# Logs
-logs
-*.log
-
-# Runtime data
-pids
-*.pid
-*.seed
-*.pid.lock
-
-# Coverage directory used by tools like istanbul
-coverage/
-
-# Docker volumes and data
-data/
-docker-data/
-volumes/
-
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Temporary folders
-tmp/
-temp/
-
-# n8n specific
-n8n/
-n8n_public/
-
-# Ngrok (if used)
-ngrok.yml
-
-# Docker compose override
-docker-compose.override.yml
-`;
-
-  try {
-    fs.writeFileSync(gitignorePath, gitignoreContent);
-    console.log(colors.green("✓ Created .gitignore with default content"));
-  } catch (error) {
-    console.log(colors.yellow("Could not create .gitignore:"), error.message);
-  }
-}
-
 // Function to execute script with dynamic path detection
-function executeScript(scriptName) {
+function executeScript(scriptName, args = []) {
   let scriptPath;
   let scriptCommand;
 
-  // Check in scripts directory first
-  const scriptsDirPath = path.join(process.cwd(), "scripts", scriptName);
+  // Check in package scripts directory first
+  const packageScriptPath = path.join(SCRIPTS_DIR, scriptName);
+  const localScriptsPath = path.join(process.cwd(), "scripts", scriptName);
   const rootPath = path.join(process.cwd(), scriptName);
 
-  if (fs.existsSync(scriptsDirPath)) {
-    scriptPath = scriptsDirPath;
+  if (fs.existsSync(packageScriptPath)) {
+    scriptPath = packageScriptPath;
+    scriptCommand = `"${packageScriptPath}"`;
+  } else if (fs.existsSync(localScriptsPath)) {
+    scriptPath = localScriptsPath;
     scriptCommand = `./scripts/${scriptName}`;
   } else if (fs.existsSync(rootPath)) {
     scriptPath = rootPath;
@@ -229,7 +80,7 @@ function executeScript(scriptName) {
       )
     );
   } else {
-    throw new Error(`${scriptName} not found in scripts/ or root directory!`);
+    throw new Error(`${scriptName} not found!`);
   }
 
   // Ensure script has execute permissions
@@ -241,7 +92,9 @@ function executeScript(scriptName) {
     );
   }
 
-  execSync(scriptCommand, { stdio: "inherit", cwd: process.cwd() });
+  // Execute script with arguments
+  const fullCommand = `${scriptCommand} ${args.join(" ")}`;
+  execSync(fullCommand, { stdio: "inherit", cwd: process.cwd() });
 }
 
 // Function to validate environment variables
@@ -341,42 +194,8 @@ function createProject(projectName) {
       process.exit(1);
     }
 
-    // Create project directory
-    fs.mkdirSync(projectName, { recursive: true });
-    console.log(colors.green(`✓ Created project directory: ${projectName}`));
-
-    // Copy template files from package templates directory
-    copyTemplateFiles(projectName);
-
-    // Copy script files from package scripts directory
-    copyScriptFiles(projectName);
-
-    // Create .env from .env.example
-    const envExamplePath = path.join(
-      process.cwd(),
-      projectName,
-      ".env.example"
-    );
-    const envFilePath = path.join(process.cwd(), projectName, ".env");
-
-    if (fs.existsSync(envExamplePath)) {
-      fs.copyFileSync(envExamplePath, envFilePath);
-      console.log(colors.green("✓ Created .env file from template"));
-
-      // Show important environment variables to configure
-      console.log(
-        colors.yellow(
-          "\nImportant: Please configure these environment variables:"
-        )
-      );
-      console.log(
-        colors.cyan(
-          "  - NGROK_AUTH_TOKEN (get from https://dashboard.ngrok.com/get-started/your-authtoken)"
-        )
-      );
-      console.log(colors.cyan("  - N8N_PORT (default: 5678)"));
-      console.log(colors.cyan("  - N8N_PROTOCOL (http or https)"));
-    }
+    // Execute the create.sh script with the project name as argument
+    executeScript("create.sh", [projectName]);
 
     console.log(colors.green("\n🎉 Project created successfully!"));
     console.log(colors.yellow("\nNext steps:"));
