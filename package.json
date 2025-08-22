@@ -1,6 +1,6 @@
 {
   "name": "tunn8n",
-  "version": "1.1.13",
+  "version": "1.1.14",
   "description": "🚀 A production-ready template for n8n automation with Docker and Ngrok",
   "keywords": [
     "n8n",
