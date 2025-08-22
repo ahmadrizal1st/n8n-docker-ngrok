@@ -1,13 +1,19 @@
 #!/bin/bash
 
-# Colors for output
-GREEN='\033[0;32m'
-RED='\033[0;31m'
-BLUE='\033[0;34m'
-YELLOW='\033[1;33m'
-CYAN='\033[0;36m'
-GRAY='\033[0;90m'
-NC='\033[0m' # No Color
+# Define TUNN8N color palette
+DARK_BLUE='\033[0;38;5;18m'
+BLUE='\033[0;38;5;27m'
+LIGHT_BLUE='\033[0;38;5;39m'
+CYAN='\033[0;38;5;51m'
+PURPLE='\033[0;38;5;129m'
+PINK='\033[0;38;5;205m'
+GREEN='\033[0;38;5;46m'
+YELLOW='\033[0;38;5;226m'
+ORANGE='\033[0;38;5;208m'
+RED='\033[0;38;5;196m'
+WHITE='\033[1;38;5;255m'
+GRAY='\033[0;38;5;245m'
+NC='\033[0m'
 
 # Function to print colored output
 print_color() {
@@ -16,161 +22,115 @@ print_color() {
     echo -e "${color}${message}${NC}"
 }
 
-# Function to copy template files
-copy_template_files() {
-    local project_name=$1
-    local templates_dir="./templates"
+# TUNN8N - Docker Tunnel Manager
+# Simplified version
+
+print_header() {
+    clear
+    echo -e "${DARK_BLUE}"
+    # Row 1 - T U N N 8 N
+    echo -e "${BLUE}  ████████╗${WHITE}██╗   ██╗${BLUE}███╗   ██╗${CYAN}███╗   ██╗${PINK}  █████╗  ${CYAN}███╗   ██╗${NC}"
     
-    if [ ! -d "$templates_dir" ]; then
-        print_color "$RED" "Error: Templates directory not found!"
-        exit 1
-    fi
+    # Row 2 - T U N N 8 N
+    echo -e "${BLUE}  ╚══██╔══╝${WHITE}██║   ██║${BLUE}████╗  ██║${CYAN}████╗  ██║${PINK} ██╔══██╗ ${CYAN}████╗  ██║${NC}"
     
-    # Copy all files from templates directory
-    cp -r "$templates_dir"/* "$project_name/"
-    print_color "$GREEN" "✓ Copied template files"
+    # Row 3 - T U N N 8 N
+    echo -e "${BLUE}     ██║   ${WHITE}██║   ██║${BLUE}██╔██╗ ██║${CYAN}██╔██╗ ██║${PINK}  █████║  ${CYAN}██╔██╗ ██║${NC}"
     
-    # Create .gitignore if it doesn't exist
-    create_gitignore "$project_name"
+    # Row 4 - T U N N 8 N
+    echo -e "${BLUE}     ██║   ${WHITE}██║   ██║${BLUE}██║╚██╗██║${CYAN}██║╚██╗██║${PINK} ██║  ██║ ${CYAN}██║╚██╗██║${NC}"
+    
+    # Row 5 - T U N N 8 N
+    echo -e "${BLUE}     ██║   ${WHITE}╚██████╔╝${BLUE}██║ ╚████║${CYAN}██║ ╚████║${PINK} ╚█████╔╝ ${CYAN}██║ ╚████║${NC}"
+    
+    # Row 6 - T U N N 8 N
+    echo -e "${BLUE}     ╚═╝    ${WHITE}╚═════╝ ${BLUE}╚═╝  ╚═══╝${CYAN}╚═╝  ╚═══╝${PINK}  ╚════╝  ${CYAN}╚═╝  ╚═══╝${NC}"
+    echo -e "${NC}"
+    echo -e "${LIGHT_BLUE}${CORNER_TL}${LINE_H}${LINE_H}${LINE_H}${LINE_H}${LINE_H}${LINE_H}${LINE_H}${LINE_H}${LINE_H}${LINE_H}${LINE_H}${LINE_H}${LINE_H}${LINE_H}${LINE_H}${LINE_H}${LINE_H}${LINE_H}${LINE_H}${LINE_H}${LINE_H}${LINE_H}${LINE_H}${LINE_H}${LINE_H}${LINE_H}${LINE_H}${LINE_H}${LINE_H}${LINE_H}${LINE_H}${LINE_H}${LINE_H}${CORNER_TR}"
+    echo -e "${LINE_V}    Docker Tunnel Management System    ${LINE_V}"
+    echo -e "${CORNER_BL}${LINE_H}${LINE_H}${LINE_H}${LINE_H}${LINE_H}${LINE_H}${LINE_H}${LINE_H}${LINE_H}${LINE_H}${LINE_H}${LINE_H}${LINE_H}${LINE_H}${LINE_H}${LINE_H}${LINE_H}${LINE_H}${LINE_H}${LINE_H}${LINE_H}${LINE_H}${LINE_H}${LINE_H}${LINE_H}${LINE_H}${LINE_H}${LINE_H}${LINE_H}${LINE_H}${LINE_H}${LINE_H}${LINE_H}${CORNER_BR}"
+    echo -e "${NC}"
 }
 
-# Function to create .gitignore
-create_gitignore() {
-    local project_name=$1
-    local gitignore_path="$project_name/.gitignore"
-    
-    if [ -f "$gitignore_path" ]; then
-        print_color "$GRAY" ".gitignore already exists"
-        return
-    fi
-    
-    cat > "$gitignore_path" << 'EOF'
-# Dependencies
-node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
+print_success() {
+    echo -e "${GREEN}✓ ${1}${NC}"
+}
 
-# Environment variables
-.env
-.env.local
-.env.production
+print_error() {
+    echo -e "${RED}✗ ${1}${NC}"
+}
 
-# Logs
-logs
-*.log
+print_info() {
+    echo -e "${CYAN}ℹ ${1}${NC}"
+}
 
-# Runtime data
-pids
-*.pid
-*.seed
-*.pid.lock
-
-# Coverage directory used by tools like istanbul
-coverage/
-
-# Docker volumes and data
-data/
-docker-data/
-volumes/
-
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Temporary folders
-tmp/
-temp/
-
-# n8n specific
-n8n/
-n8n_public/
-
-# Ngrok (if used)
-ngrok.yml
-
-# Docker compose override
-docker-compose.override.yml
+load_env() {
+    if [ -f .env ]; then
+        export $(cat .env | grep -v '#' | awk '/=/ {print $1}')
+        print_success "Environment variables loaded"
+    else
+        print_info "Creating default .env file"
+        cat > .env << EOF
+NGROK_AUTH_TOKEN=your_ngrok_auth_token_here
+N8N_HOST=localhost
+N8N_PORT=5678
+N8N_PROTOCOL=http
 EOF
-
-    print_color "$GREEN" "✓ Created .gitignore with default content"
+        print_info "Please update .env with your values"
+    fi
 }
 
-# Function to copy script files
-copy_script_files() {
-    local project_name=$1
-    local scripts_dir="./scripts"
-    local target_scripts_dir="$project_name/scripts"
+check_containers() {
+    local count=$(docker ps -a --filter "name=n8n" --format "{{.Names}}" | wc -l)
+    [ "$count" -gt 0 ] && return 0 || return 1
+}
+
+deploy_services() {
+    if check_containers; then
+        print_info "Starting existing containers"
+        docker-compose up -d
+    else
+        print_info "Building new containers"
+        docker-compose up -d --build
+    fi
+}
+
+get_ngrok_url() {
+    local url=$(docker logs n8n-ngrok 2>&1 | grep -oE "url=https://[a-zA-Z0-9.-]+\.ngrok-free\.app" | head -1 | sed 's/url=//')
     
-    if [ ! -d "$scripts_dir" ]; then
-        print_color "$RED" "Error: Scripts directory not found!"
+    if [ -z "$url" ]; then
+        url=$(docker logs n8n-ngrok 2>&1 | grep -oE 'https://[a-zA-Z0-9.-]+\.ngrok\.io' | head -1)
+    fi
+    
+    if [ -n "$url" ]; then
+        echo "$url" > ngrok_url.txt
+        print_success "Tunnel URL: $url"
+    else
+        print_error "Could not retrieve tunnel URL"
+    fi
+}
+
+main() {
+    print_header
+    load_env
+    
+    if deploy_services; then
+        print_info "Waiting for services to start..."
+        sleep 10
+        
+        print_info "Service status:"
+        docker ps --filter "name=n8n" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
+        
+        get_ngrok_url
+        
+        echo
+        print_success "Deployment completed!"
+        echo -e "${CYAN}Local:  http://localhost:5678${NC}"
+        echo -e "${CYAN}Tunnel: $(cat ngrok_url.txt 2>/dev/null || echo 'Check logs')${NC}"
+    else
+        print_error "Deployment failed"
         exit 1
     fi
-    
-    # Create scripts directory
-    mkdir -p "$target_scripts_dir"
-    
-    # Copy all script files
-    cp -r "$scripts_dir"/* "$target_scripts_dir/"
-    
-    # Make scripts executable
-    chmod +x "$target_scripts_dir"/*.sh
-    
-    print_color "$GREEN" "✓ Copied and made scripts executable"
 }
 
-# Main function
-create_project() {
-    local project_name=$1
-    
-    print_color "$BLUE" "Creating new tunn8n project: $project_name"
-    
-    # Check if directory already exists
-    if [ -d "$project_name" ]; then
-        print_color "$RED" "Error: Directory '$project_name' already exists!"
-        print_color "$YELLOW" "Please choose a different project name or remove the existing directory."
-        exit 1
-    fi
-    
-    # Create project directory
-    mkdir -p "$project_name"
-    print_color "$GREEN" "✓ Created project directory: $project_name"
-    
-    # Copy template files
-    copy_template_files "$project_name"
-    
-    # Copy script files
-    copy_script_files "$project_name"
-    
-    # Create .env from .env.example if it exists
-    local env_example_path="$project_name/.env.example"
-    local env_file_path="$project_name/.env"
-    
-    if [ -f "$env_example_path" ]; then
-        cp "$env_example_path" "$env_file_path"
-        print_color "$GREEN" "✓ Created .env file from template"
-    fi
-    
-    print_color "$GREEN" "\n🎉 Project created successfully!"
-    print_color "$YELLOW" "\nNext steps:"
-    print_color "$CYAN" "  cd $project_name"
-    print_color "$CYAN" "  # Edit .env file with your configuration"
-    print_color "$CYAN" "  ./scripts/start.sh   # Start services"
-    print_color "$CYAN" "  ./scripts/status.sh  # Check service status"
-}
-
-# Check if project name is provided
-if [ $# -eq 0 ]; then
-    print_color "$RED" "Error: Project name required!"
-    print_color "$CYAN" "Usage: ./create.sh <project-name>"
-    exit 1
-fi
-
-# Run main function with provided project name
-create_project "$1"
+main "$@"
