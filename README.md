@@ -153,17 +153,15 @@ tunn8n --help
 
 ```
 my-automation-project/
-├── scripts/               # Shell scripts for service management
-│   ├── start.sh          # Start services script
-│   ├── stop.sh           # Stop services script  
-│   ├── status.sh         # Status monitoring script
-│   └── debug.sh          # Debugging utilities
 ├── docker-compose.yml    # Docker compose configuration
 ├── .env                  # Environment variables (created by tunn8n init)
-├── .env.example          # Environment template
+├── .env.example          # Environment template and dependencies
 ├── .gitignore           # Git ignore rules
+├── package.json          # Project metadata
 └── README.md            # Project documentation
 ```
+
+
 
 ## 🌐 Access Points
 
