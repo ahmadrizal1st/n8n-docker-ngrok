@@ -9,7 +9,7 @@ const COLORS = {
   GREEN: "\x1b[32m",
   YELLOW: "\x1b[33m",
   BLUE: "\x1b[34m",
-  NC: "\x1b[0m", // No Color
+  NC: "\x1b[0m",
 };
 
 // Symbols

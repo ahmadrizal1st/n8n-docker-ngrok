@@ -284,7 +284,7 @@ if (command === "--help" || command === "-h") {
 switch (command) {
   case "create":
     if (args[0]) {
-      createProjectScript(args[0]); // Panggil fungsi dari file create.js
+      createProjectScript(args[0]);
     } else {
       console.log(colors.red("Error: Project name required!"));
       console.log(colors.cyan("Usage: tunn8n create <project-name>"));
