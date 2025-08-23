@@ -309,7 +309,7 @@ MIT License - feel free to use this project for your automation needs!
 
 ## 🔄 Changelog
 
-### Version 1.3.25
+### Version 1.3.26
 
 - **Enhanced CLI** with better error handling and fallback mechanisms
 - **Automatic script permissions** management
