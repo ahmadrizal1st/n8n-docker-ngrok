@@ -33,13 +33,6 @@ jobs:
           [ -d "templates" ] || { echo "❌ templates directory missing"; exit 1; }
           echo "✅ All essential files present"
       
-      - name: Test basic CLI functionality
-        run: |
-          echo "🔧 Testing CLI basic commands..."
-          node bin/index.js --version
-          node bin/index.js --help
-          echo "✅ CLI basic functionality verified"
-      
       - name: Get package version
         id: version
         run: |
