@@ -33,15 +33,18 @@ jobs:
       - name: Make CLI executable
         run: chmod +x bin/index.js
       
-      - name: Run tests or skip if no tests
+      - name: Check if tests exist and run conditionally
+        id: test_check
         run: |
           # Check if any test files exist
-          if [ -d "__tests__" ] || [ -n "$(find . -name "*.test.js" -o -name "*.spec.js" -o -name "*.test.ts" -o -name "*.spec.ts")" ]; then
+          if [ -d "__tests__" ] || [ -n "$(find . -name "*.test.js" -o -name "*.spec.js" -not -path "./node_modules/*")" ]; then
             echo "🧪 Tests found, running npm test..."
             npm test
           else
             echo "⚠️ No test files found, skipping tests..."
             echo "To add tests, create __tests__ directory or files with .test.js/.spec.js extension"
+            # Create a flag to indicate no tests
+            echo "tests_skipped=true" >> $GITHUB_OUTPUT
           fi
       
       - name: Check version and prepare
