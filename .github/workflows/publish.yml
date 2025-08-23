@@ -1,4 +1,4 @@
-name: Publish Tunn8n to GitHub Packages
+name: Publish Tun8n to GitHub Packages
 
 on:
   push:

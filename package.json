@@ -14,13 +14,13 @@
     "reverse-proxy",
     "devops"
   ],
-  "homepage": "https://github.com/tun8n/#readme",
+  "homepage": "https://github.com/ahmadrizal1st/tun8n#readme",
   "bugs": {
-    "url": "https://github.com/tun8n/issues"
+    "url": "https://github.com/ahmadrizal1st/tun8n/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/tun8n.git",
+    "url": "git+https://github.com/ahmadrizal1st/tun8n.git",
     "directory": "./"
   },
   "license": "MIT",
@@ -49,13 +49,13 @@
     "LICENSE"
   ],
   "scripts": {
+    "prepublishOnly": "chmod +x bin/index.js",
     "test": "jest"
   },
   "engines": {
     "node": ">=14.0.0"
   },
   "publishConfig": {
-    "registry": "https://npm.pkg.github.com",
     "access": "public"
   }
 }
