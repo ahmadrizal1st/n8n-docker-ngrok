@@ -50,11 +50,7 @@
   ],
   "scripts": {
     "prepublishOnly": "chmod +x bin/index.js",
-    "postpublish": "git push && git push --tags",
-    "start": "node bin/index.js",
-    "test": "jest --passWithNoTests",
-    "test:watch": "jest --watch",
-    "version": "npm test"
+    "postpublish": "git push && git push --tags"
   },
   "engines": {
     "node": ">=14.0.0"
