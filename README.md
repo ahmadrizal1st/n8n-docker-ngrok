@@ -220,23 +220,26 @@ docker system prune -f
 ### Common Issues
 
 1. **Port 5678 already in use**
-   
+
    ```bash
    # Change N8N_PORT in .env file
    N8N_PORT=5679
    ```
+
 2. **Ngrok authentication errors**
-   
+
    - Verify `NGROK_AUTHTOKEN` in `.env` file
    - Check token at [Ngrok Dashboard](https://dashboard.ngrok.com/get-started/your-authtoken)
+
 3. **Docker permission issues** (Linux)
-   
+
    ```bash
    sudo usermod -aG docker $USER
    newgrp docker
    ```
+
 4. **Script permission issues**
-   
+
    ```bash
    # Grant execute permissions to scripts
    chmod +x bin/scripts/*.js
@@ -310,7 +313,7 @@ _For issues and contributions, please check the project repository._
 
 ## 🔄 Changelog
 
-### Version 1.3.27
+### Version 1.3.28
 
 - **Enhanced CLI** with better error handling and fallback mechanisms
 - **Automatic script permissions** management
@@ -332,4 +335,3 @@ _For issues and contributions, please check the project repository._
 ---
 
 _Note: This tool automatically handles script permissions and provides fallback mechanisms for robust operation across different environments._
-

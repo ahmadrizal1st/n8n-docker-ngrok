@@ -1,6 +1,6 @@
 {
   "name": "@ahmadrizal1st/tun8n",
-  "version": "1.3.27",
+  "version": "1.3.28",
   "description": "🚀 A production-ready template for n8n automation with Docker and Ngrok",
   "keywords": [
     "n8n",
