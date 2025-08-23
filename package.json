@@ -14,13 +14,13 @@
     "reverse-proxy",
     "devops"
   ],
-  "homepage": "https://github.com/tun8n/cli#readme",
+  "homepage": "https://github.com/tun8n/#readme",
   "bugs": {
-    "url": "https://github.com/tun8n/cli/issues"
+    "url": "https://github.com/tun8n/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/tun8n/cli.git",
+    "url": "git+https://github.com/tun8n.git",
     "directory": "./"
   },
   "license": "MIT",
