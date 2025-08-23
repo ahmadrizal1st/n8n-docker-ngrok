@@ -1,18 +1,199 @@
-name: Publish to npm
+name: Publish NPM package
+
 on:
-  release:
-    types: [created]
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*'
+  workflow_dispatch: # Manual trigger
 
 jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: '20'
           registry-url: 'https://registry.npmjs.org'
-      - run: npm ci
-      - run: npm publish
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Make CLI executable
+        run: chmod +x bin/index.js
+      
+      - name: Run tests
+        run: npm test
+        env:
+          NODE_ENV: test
+      
+      - name: Check version and prepare
+        id: version_check
+        run: |
+          # Get current version from package.json
+          CURRENT_VERSION=$(node -p "require('./package.json').version")
+          echo "Current version: $CURRENT_VERSION"
+          
+          # Get latest tag
+          LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+          echo "Latest tag: $LATEST_TAG"
+          
+          # Extract version number from tag (remove 'v' prefix)
+          LATEST_VERSION=${LATEST_TAG#v}
+          
+          if [ "$LATEST_VERSION" != "$CURRENT_VERSION" ]; then
+            echo "🚀 Version changed: $LATEST_VERSION -> $CURRENT_VERSION"
+            echo "version_changed=true" >> $GITHUB_OUTPUT
+            echo "new_version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+          else
+            echo "✅ Version not changed ($CURRENT_VERSION)"
+            echo "version_changed=false" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Validate CLI functionality
+        if: steps.version_check.outputs.version_changed == 'true'
+        run: |
+          # Test basic CLI functionality
+          echo "Testing CLI help command..."
+          node bin/index.js --help
+          
+          echo "Testing CLI version command..."
+          node bin/index.js --version
+          
+          echo "✅ CLI validation passed"
+      
+      - name: Verify file structure
+        if: steps.version_check.outputs.version_changed == 'true'
+        run: |
+          echo "Checking required files..."
+          
+          # Check main CLI file
+          if [ ! -f "bin/index.js" ]; then
+            echo "❌ Error: bin/index.js not found"
+            exit 1
+          fi
+          
+          # Check scripts directory
+          if [ ! -d "bin/scripts" ]; then
+            echo "❌ Error: bin/scripts directory not found"
+            exit 1
+          fi
+          
+          # Check required script files
+          for script in start.js stop.js debug.js status.js create.js; do
+            if [ ! -f "bin/scripts/$script" ]; then
+              echo "❌ Error: bin/scripts/$script not found"
+              exit 1
+            fi
+          done
+          
+          # Check templates
+          if [ ! -d "templates" ]; then
+            echo "❌ Error: templates directory not found"
+            exit 1
+          fi
+          
+          echo "✅ File structure validation passed"
+      
+      - name: Publish to npm
+        if: steps.version_check.outputs.version_changed == 'true'
+        run: |
+          echo "Publishing version ${{ steps.version_check.outputs.new_version }} to npm..."
+          npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      
+      - name: Create Git tag
+        if: steps.version_check.outputs.version_changed == 'true'
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git tag -a "v${{ steps.version_check.outputs.new_version }}" -m "Release v${{ steps.version_check.outputs.new_version }}"
+          git push origin "v${{ steps.version_check.outputs.new_version }}"
+      
+      - name: Create GitHub Release
+        if: steps.version_check.outputs.version_changed == 'true'
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: "v${{ steps.version_check.outputs.new_version }}"
+          name: "tunn8n v${{ steps.version_check.outputs.new_version }}"
+          body: |
+            ## 🚀 tunn8n CLI v${{ steps.version_check.outputs.new_version }}
+            
+            ### What's New
+            - Automated release
+            - Docker + n8n + Ngrok integration
+            - CLI tool for easy management
+            
+            ### Features
+            - `tunn8n create <project>` - Create new n8n project
+            - `tunn8n start` - Start docker services
+            - `tunn8n stop` - Stop docker services
+            - `tunn8n status` - Check service status
+            - `tunn8n debug` - Debug mode
+            - `tunn8n init` - Initialize .env file
+            
+            ### Usage
+            ```bash
+            # Install globally
+            npm install -g tunn8n
+            
+            # Create new project
+            tunn8n create my-automation
+            cd my-automation
+            
+            # Start services
+            tunn8n start
+            ```
+            
+            ### File Structure
+            ```
+            📦 project/
+            ├── 📄 docker-compose.yml
+            ├── 📄 .env
+            ├── 📄 .env.example
+            ├── 📄 .gitignore
+            └── 📄 README.md
+            ```
+          files: |
+            README.md
+            LICENSE
+            bin/
+            templates/
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Notify success
+        if: steps.version_check.outputs.version_changed == 'true'
+        run: |
+          echo "🎉 Successfully published tunn8n v${{ steps.version_check.outputs.new_version }}"
+          echo "📦 npm: https://www.npmjs.com/package/tunn8n"
+          echo "🐙 GitHub: https://github.com/${{ github.repository }}/releases/tag/v${{ steps.version_check.outputs.new_version }}"
+
+  test-cli:
+    runs-on: ubuntu-latest
+    needs: publish
+    if: steps.version_check.outputs.version_changed == 'true'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: Install tunn8n globally (from npm)
+        run: |
+          npm install -g tunn8n@${{ steps.version_check.outputs.new_version }}
+          tunn8n --version
+          tunn8n --help
