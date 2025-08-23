@@ -1,77 +1,20 @@
-name: Publish NPM package
+name: Tunn8n Package
 
 on:
   push:
-    tags:
-      - 'v*'
-  workflow_dispatch:
+    branches:
+      - main
 
 jobs:
-  publish:
+  publish-gpr:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
         with:
-          node-version: '20'
-          registry-url: 'https://registry.npmjs.org'
-      
-      - name: Install dependencies
-        run: npm install
-      
-      - name: Make CLI executable
-        run: chmod +x bin/index.js
-      
-      - name: Verify essential files
-        run: |
-          echo "📁 Checking essential files..."
-          [ -f "bin/index.js" ] || { echo "❌ bin/index.js missing"; exit 1; }
-          [ -d "bin/scripts" ] || { echo "❌ bin/scripts directory missing"; exit 1; }
-          [ -d "templates" ] || { echo "❌ templates directory missing"; exit 1; }
-          echo "✅ All essential files present"
-      
-      # TAMBAHKAN STEP INI UNTUK MENGATASI ERROR TEST
-      - name: Run tests (skip if no tests)
-        run: npm test -- --passWithNoTests || echo "Tests completed with no tests found"
-      
-      - name: Get package version
-        id: version
-        run: |
-          VERSION=$(node -p "require('./package.json').version")
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-          echo "📦 Package version: $VERSION"
-      
-      - name: Publish to npm
-        run: |
-          echo "🚀 Publishing to npm..."
-          npm publish --access public
+          node-version: 12
+          registry-url: https://npm.pkg.github.com/
+          scope: '@ahmadrizal1st'
+      - run: npm publish
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-      
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: "v${{ steps.version.outputs.version }}"
-          name: "tunn8n v${{ steps.version.outputs.version }}"
-          body: |
-            ## 🚀 tunn8n v${{ steps.version.outputs.version }}
-            
-            CLI tool for n8n with Docker & Ngrok integration
-            
-            **Install:**
-            ```bash
-            npm install -g tunn8n
-            ```
-          files: |
-            README.md
-            LICENSE
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      
-      - name: Success message
-        run: |
-          echo "🎉 Successfully published tunn8n v${{ steps.version.outputs.version }}"
-          echo "📦 npm: https://www.npmjs.com/package/tunn8n"
+          NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
