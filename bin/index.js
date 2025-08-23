@@ -92,18 +92,18 @@ function validateEnvVars() {
 
 function showHelp() {
   console.log(`
-${colors.bold("🚀 Tunn8n CLI - n8n with Docker & Ngrok")}
+${colors.bold("🚀 tun8n CLI - n8n with Docker & Ngrok")}
 
 ${colors.bold("Usage:")}
-  tunn8n create <project-name>  Create new n8n project
-  tunn8n start                 Start docker services
-  tunn8n stop                  Stop docker services  
-  tunn8n status                Check service status
-  tunn8n debug                 Debug mode
-  tunn8n init                  Initialize .env file
-  tunn8n update                Update tunn8n to latest version
-  tunn8n --version             Show version
-  tunn8n --help                Show this help message
+  tun8n create <project-name>  Create new n8n project
+  tun8n start                 Start docker services
+  tun8n stop                  Stop docker services  
+  tun8n status                Check service status
+  tun8n debug                 Debug mode
+  tun8n init                  Initialize .env file
+  tun8n update                Update tun8n to latest version
+  tun8n --version             Show version
+  tun8n --help                Show this help message
 
 ${colors.bold("Project Structure:")}
   📄 docker-compose.yml - Docker service definitions
@@ -114,15 +114,15 @@ ${colors.bold("Project Structure:")}
   📄 package.json - Project metadata and dependencies
 
 ${colors.bold("Examples:")}
-  tunn8n create my-automation
+  tun8n create my-automation
   cd my-automation
-  tunn8n start
-  tunn8n status
+  tun8n start
+  tun8n status
   `);
 }
 
 function startService() {
-  console.log(colors.blue("Starting tunn8n services..."));
+  console.log(colors.blue("Starting tun8n services..."));
 
   try {
     // Check if Docker is available
@@ -151,7 +151,7 @@ function startService() {
 
     console.log(colors.green("✓ Services started successfully!"));
   } catch (error) {
-    console.log(colors.red("Error starting tunn8n:"), error.message);
+    console.log(colors.red("Error starting tun8n:"), error.message);
     console.log(
       colors.yellow(
         "Make sure Docker is running and you have proper permissions"
@@ -161,7 +161,7 @@ function startService() {
 }
 
 function stopService() {
-  console.log(colors.blue("Stopping tunn8n services..."));
+  console.log(colors.blue("Stopping tun8n services..."));
   try {
     if (typeof stopServiceScript === "function") {
       stopServiceScript();
@@ -173,7 +173,7 @@ function stopService() {
 
     console.log(colors.green("✓ Services stopped successfully!"));
   } catch (error) {
-    console.log(colors.red("Error stopping tunn8n:"), error.message);
+    console.log(colors.red("Error stopping tun8n:"), error.message);
 
     // Fallback to direct docker command
     try {
@@ -252,18 +252,18 @@ function initProject() {
   }
 }
 
-function updateTunn8n() {
-  console.log(colors.blue("Updating tunn8n to latest version..."));
+function updatetun8n() {
+  console.log(colors.blue("Updating tun8n to latest version..."));
   try {
-    execSync("npm install -g tunn8n@latest", { stdio: "inherit" });
-    console.log(colors.green("✓ tunn8n updated successfully!"));
+    execSync("npm install -g tun8n@latest", { stdio: "inherit" });
+    console.log(colors.green("✓ tun8n updated successfully!"));
   } catch (error) {
-    console.log(colors.red("Error updating tunn8n:"), error.message);
+    console.log(colors.red("Error updating tun8n:"), error.message);
   }
 }
 
 function showVersion() {
-  console.log(colors.blue(`tunn8n CLI Version: ${getPackageVersion()}`));
+  console.log(colors.blue(`tun8n CLI Version: ${getPackageVersion()}`));
   console.log(colors.gray("Template: n8n with Docker + Ngrok integration"));
 }
 
@@ -283,7 +283,7 @@ switch (command) {
       createProjectScript(args[0]);
     } else {
       console.log(colors.red("Error: Project name required!"));
-      console.log(colors.cyan("Usage: tunn8n create <project-name>"));
+      console.log(colors.cyan("Usage: tun8n create <project-name>"));
       process.exit(1);
     }
     break;
@@ -309,7 +309,7 @@ switch (command) {
     break;
 
   case "update":
-    updateTunn8n();
+    updatetun8n();
     break;
 
   case "--version":

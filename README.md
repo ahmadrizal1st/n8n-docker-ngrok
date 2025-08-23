@@ -1,4 +1,4 @@
-# Tunn8n - N8N + Ngrok Docker Starter
+# tun8n - N8N + Ngrok Docker Starter
 
 A complete CLI tool to create and manage n8n (workflow automation) with Docker and expose it to the internet using Ngrok with custom domain support.
 
@@ -22,19 +22,19 @@ A complete CLI tool to create and manage n8n (workflow automation) with Docker a
 
 ```bash
 # Install globally
-npm install -g tunn8n@latest
+npm install -g tun8n@latest
 
 # Verify installation
-tunn8n --version
-tunn8n -v
+tun8n --version
+tun8n -v
 ```
 
 ### Method 2: Manual Setup (if preferred)
 
 ```bash
 # Clone the repository
-git clone https://github.com/ahmadrizal1st/tunn8n.git
-cd tunn8n
+git clone https://github.com/ahmadrizal1st/tun8n.git
+cd tun8n
 
 # Install dependencies(optional)
 npm install
@@ -49,7 +49,7 @@ npm link
 
 ```bash
 # Create new n8n project
-tunn8n create my-automation-project
+tun8n create my-automation-project
 
 # Navigate to project
 cd my-automation-project
@@ -59,7 +59,7 @@ cd my-automation-project
 
 ```bash
 # Setup environment configuration
-tunn8n init
+tun8n init
 
 # Edit .env file with your settings
 nano .env  # or use your favorite editor
@@ -91,7 +91,7 @@ TZ=Asia/Jakarta
 
 ```bash
 # Start n8n with Ngrok tunnel
-tunn8n start
+tun8n start
 ```
 
 ## 🛠️ CLI Commands
@@ -100,40 +100,40 @@ tunn8n start
 
 ```bash
 # Create new project
-tunn8n create <project-name>
+tun8n create <project-name>
 
 # Initialize environment (create .env from template)
-tunn8n init
+tun8n init
 
 # Update to latest version
-tunn8n update
+tun8n update
 ```
 
 ### Service Control
 
 ```bash
 # Start all services
-tunn8n start
+tun8n start
 
 # Check service status
-tunn8n status
+tun8n status
 
 # View debug information and logs
-tunn8n debug
+tun8n debug
 
 # Stop all services
-tunn8n stop
+tun8n stop
 ```
 
 ### Information
 
 ```bash
 # Show version
-tunn8n --version
-tunn8n -v
+tun8n --version
+tun8n -v
 
 # Show help
-tunn8n --help
+tun8n --help
 ```
 
 ## 📋 Prerequisites
@@ -155,7 +155,7 @@ tunn8n --help
 ```
 my-automation-project/
 ├── docker-compose.yml    # Docker compose configuration
-├── .env                  # Environment variables (created by tunn8n init)
+├── .env                  # Environment variables (created by tun8n init)
 ├── .env.example          # Environment template and dependencies
 ├── .gitignore           # Git ignore rules
 ├── package.json          # Project metadata
@@ -175,7 +175,7 @@ After starting services:
 ### Check Service Status
 
 ```bash
-tunn8n status
+tun8n status
 
 # Or manually
 docker-compose ps
@@ -185,7 +185,7 @@ docker stats
 ### View Logs
 
 ```bash
-tunn8n debug
+tun8n debug
 
 # Or follow specific logs
 docker-compose logs -f n8n-app
@@ -198,7 +198,7 @@ docker-compose logs -f n8n-ngrok
 
 ```bash
 # Using CLI
-tunn8n stop
+tun8n stop
 
 # Using Docker directly
 docker-compose down
@@ -219,23 +219,26 @@ docker system prune -f
 ### Common Issues
 
 1. **Port 5678 already in use**
-   
+
    ```bash
    # Change N8N_PORT in .env file
    N8N_PORT=5679
    ```
+
 2. **Ngrok authentication errors**
-   
+
    - Verify `NGROK_AUTHTOKEN` in `.env` file
    - Check token at [Ngrok Dashboard](https://dashboard.ngrok.com/get-started/your-authtoken)
+
 3. **Docker permission issues** (Linux)
-   
+
    ```bash
    sudo usermod -aG docker $USER
    newgrp docker
    ```
+
 4. **Script permission issues**
-   
+
    ```bash
    # Grant execute permissions to scripts
    chmod +x bin/scripts/*.js
@@ -273,28 +276,28 @@ docker logs n8n-app --tail 50
 
 ### Getting Help
 
-1. Check logs: `tunn8n debug`
+1. Check logs: `tun8n debug`
 2. Verify Ngrok token is correct
 3. Ensure Docker is running
 4. Check port availability
-5. Validate environment variables: `tunn8n init` and check `.env` file
+5. Validate environment variables: `tun8n init` and check `.env` file
 
 ## 🎯 Example Usage
 
 ```bash
 # Complete workflow example
-tunn8n create my-n8n-project
+tun8n create my-n8n-project
 cd my-n8n-project
-tunn8n init
+tun8n init
 
 # Edit .env with your Ngrok token and settings
 nano .env
 
-tunn8n start
-tunn8n status
+tun8n start
+tun8n status
 
 # When done working
-tunn8n stop
+tun8n stop
 ```
 
 ## 📝 License
@@ -305,11 +308,11 @@ MIT License - feel free to use this project for your automation needs!
 
 **Happy Automating!** 🚀
 
-*For issues and contributions, please check the project repository.*
+_For issues and contributions, please check the project repository._
 
 ## 🔄 Changelog
 
-### Version 1.3.26
+### Version 1.3.27
 
 - **Enhanced CLI** with better error handling and fallback mechanisms
 - **Automatic script permissions** management
@@ -330,5 +333,4 @@ MIT License - feel free to use this project for your automation needs!
 
 ---
 
-*Note: This tool automatically handles script permissions and provides fallback mechanisms for robust operation across different environments.*
-
+_Note: This tool automatically handles script permissions and provides fallback mechanisms for robust operation across different environments._

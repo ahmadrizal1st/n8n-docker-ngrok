@@ -40,7 +40,7 @@ function validateEnvironment() {
   const envPath = path.join(process.cwd(), ".env");
 
   if (!fs.existsSync(envPath)) {
-    throw new Error(".env file not found! Please run 'tunn8n init' first.");
+    throw new Error(".env file not found! Please run 'tun8n init' first.");
   }
 
   const envContent = fs.readFileSync(envPath, "utf8");
@@ -74,7 +74,7 @@ function validateEnvironment() {
     );
     console.log(`${COLORS.CYAN}  - N8N_PORT (e.g., 5678)${COLORS.NC}`);
     printWarning(
-      "\nYou can edit .env file or run 'tunn8n init' to recreate it."
+      "\nYou can edit .env file or run 'tun8n init' to recreate it."
     );
 
     // Ask if user wants to continue anyway
@@ -182,7 +182,7 @@ async function startService() {
     // Header
     console.log(`${COLORS.BLUE}`);
     console.log("╔══════════════════════════════════════════╗");
-    console.log("║           TUNN8N DEPLOYMENT              ║");
+    console.log("║           tun8n DEPLOYMENT              ║");
     console.log("╚══════════════════════════════════════════╝");
     console.log(`${COLORS.NC}`);
 

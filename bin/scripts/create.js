@@ -28,24 +28,24 @@ function printHeader() {
 
   console.clear();
 
-  // TUNN8N ASCII Art
+  // tun8n ASCII Art
   console.log(
-    `${COLORS.BLUE}  ████████╗${COLORS.WHITE}██╗   ██║${COLORS.BLUE}███╗   ██╗${COLORS.CYAN}███╗   ██╗${COLORS.PINK}  █████╗  ${COLORS.CYAN}███╗   ██╗${COLORS.NC}`
+    `${COLORS.BLUE}  ████████╗${COLORS.WHITE}██╗   ██║${COLORS.BLUE}███╗   ██╗${COLORS.PINK}  █████╗  ${COLORS.CYAN}███╗   ██╗${COLORS.NC}`
   );
   console.log(
-    `${COLORS.BLUE}  ╚══██╔══╝${COLORS.WHITE}██║   ██║${COLORS.BLUE}████╗  ██║${COLORS.CYAN}████╗  ██║${COLORS.PINK} ██╔══██╗ ${COLORS.CYAN}████╗  ██║${COLORS.NC}`
+    `${COLORS.BLUE}  ╚══██╔══╝${COLORS.WHITE}██║   ██║${COLORS.BLUE}████╗  ██║${COLORS.PINK} ██╔══██╗ ${COLORS.CYAN}████╗  ██║${COLORS.NC}`
   );
   console.log(
-    `${COLORS.BLUE}     ██║   ${COLORS.WHITE}██║   ██║${COLORS.BLUE}██╔██╗ ██║${COLORS.CYAN}██╔██╗ ██║${COLORS.PINK}  █████║  ${COLORS.CYAN}██╔██╗ ██║${COLORS.NC}`
+    `${COLORS.BLUE}     ██║   ${COLORS.WHITE}██║   ██║${COLORS.BLUE}██╔██╗ ██║${COLORS.PINK}  █████║  ${COLORS.CYAN}██╔██╗ ██║${COLORS.NC}`
   );
   console.log(
-    `${COLORS.BLUE}     ██║   ${COLORS.WHITE}██║   ██║${COLORS.BLUE}██║╚██╗██║${COLORS.CYAN}██║╚██╗██║${COLORS.PINK} ██║  ██║ ${COLORS.CYAN}██║╚██╗██║${COLORS.NC}`
+    `${COLORS.BLUE}     ██║   ${COLORS.WHITE}██║   ██║${COLORS.BLUE}██║╚██╗██║${COLORS.PINK} ██║  ██║ ${COLORS.CYAN}██║╚██╗██║${COLORS.NC}`
   );
   console.log(
-    `${COLORS.BLUE}     ██║   ${COLORS.WHITE}╚██████╔╝${COLORS.BLUE}██║ ╚████║${COLORS.CYAN}██║ ╚████║${COLORS.PINK} ╚█████╔╝ ${COLORS.CYAN}██║ ╚████║${COLORS.NC}`
+    `${COLORS.BLUE}     ██║   ${COLORS.WHITE}╚██████╔╝${COLORS.BLUE}██║ ╚████║${COLORS.PINK} ╚█████╔╝ ${COLORS.CYAN}██║ ╚████║${COLORS.NC}`
   );
   console.log(
-    `${COLORS.BLUE}     ╚═╝    ${COLORS.WHITE}╚═════╝ ${COLORS.BLUE}╚═╝  ╚═══╝${COLORS.CYAN}╚═╝  ╚═══╝${COLORS.PINK}  ╚════╝  ${COLORS.CYAN}╚═╝  ╚═══╝${COLORS.NC}`
+    `${COLORS.BLUE}     ╚═╝    ${COLORS.WHITE}╚═════╝ ${COLORS.BLUE}╚═╝  ╚═══╝${COLORS.PINK}  ╚════╝  ${COLORS.CYAN}╚═╝  ╚═══╝${COLORS.NC}`
   );
 
   // Header box
@@ -251,7 +251,7 @@ docker-compose.override.yml
 // Main create project function
 function createProject(projectName) {
   printHeader();
-  console.log(colors.blue(`Creating new tunn8n project: ${projectName}`));
+  console.log(colors.blue(`Creating new tun8n project: ${projectName}`));
 
   try {
     // Check if directory already exists
@@ -329,8 +329,8 @@ function createProject(projectName) {
     console.log(colors.yellow("\nNext steps:"));
     console.log(colors.cyan(`  cd ${projectName}`));
     console.log(colors.cyan("  # Edit .env file with your configuration"));
-    console.log(colors.cyan("  tunn8n start   # Start services"));
-    console.log(colors.cyan("  tunn8n status  # Check service status"));
+    console.log(colors.cyan("  tun8n start   # Start services"));
+    console.log(colors.cyan("  tun8n status  # Check service status"));
   } catch (error) {
     console.log(colors.red("Error creating project:"), error.message);
     process.exit(1);
