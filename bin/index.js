@@ -141,7 +141,6 @@ function startService() {
       validateEnvVars();
     }
 
-    // Call the imported start function
     if (typeof startServiceScript === "function") {
       startServiceScript();
     } else if (typeof startServiceScript.main === "function") {
@@ -164,7 +163,6 @@ function startService() {
 function stopService() {
   console.log(colors.blue("Stopping tunn8n services..."));
   try {
-    // Call the imported stop function
     if (typeof stopServiceScript === "function") {
       stopServiceScript();
     } else if (typeof stopServiceScript.main === "function") {
@@ -202,7 +200,6 @@ function stopService() {
 function debugService() {
   console.log(colors.blue("Running debug utilities..."));
   try {
-    // Call the imported debug function
     if (typeof debugServiceScript === "function") {
       debugServiceScript();
     } else if (typeof debugServiceScript.main === "function") {
@@ -218,7 +215,6 @@ function debugService() {
 function statusService() {
   console.log(colors.blue("Checking service status..."));
   try {
-    // Call the imported status function
     if (typeof statusServiceScript === "function") {
       statusServiceScript();
     } else if (typeof statusServiceScript.main === "function") {
