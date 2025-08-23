@@ -1,4 +1,4 @@
-# tun8n - N8N + Ngrok Docker Starter
+# Tun8n - N8N + Ngrok Docker Starter
 
 A complete CLI tool to create and manage n8n (workflow automation) with Docker and expose it to the internet using Ngrok with custom domain support.
 
