@@ -3,7 +3,7 @@ name: Publish Tunn8n to GitHub Packages
 on:
   push:
     tags:
-      - 'v*'  # Trigger pada tag yang dimulai dengan 'v'
+      - 'v*'
 
 jobs:
   publish-gpr:
