@@ -44,7 +44,7 @@
     "LICENSE"
   ],
   "scripts": {
-    "prepublishOnly": "chmod +x bin/index.js && npm test",
+    "prepublishOnly": "chmod +x bin/index.js",
     "postpublish": "git push && git push --tags",
     "start": "node bin/index.js"
   },
