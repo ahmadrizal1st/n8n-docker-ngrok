@@ -2,6 +2,8 @@ name: Publish Tunn8n to GitHub Packages
 
 on:
   push:
+    branches:
+      - main
     tags:
       - 'v*'
 
