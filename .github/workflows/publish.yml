@@ -59,7 +59,6 @@ jobs:
           fi
       
       - name: Validate CLI functionality
-        if: steps.version_check.outputs.version_changed == 'true'
         run: |
           # Test basic CLI functionality
           echo "Testing CLI help command..."
@@ -71,7 +70,6 @@ jobs:
           echo "✅ CLI validation passed"
       
       - name: Verify file structure
-        if: steps.version_check.outputs.version_changed == 'true'
         run: |
           echo "Checking required files..."
           
@@ -104,7 +102,7 @@ jobs:
           echo "✅ File structure validation passed"
       
       - name: Publish to npm
-        if: steps.version_check.outputs.version_changed == 'true'
+        if: ${{ steps.version_check.outputs.version_changed == 'true' }}
         run: |
           echo "Publishing version ${{ steps.version_check.outputs.new_version }} to npm..."
           npm publish --access public
@@ -112,7 +110,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       
       - name: Create Git tag
-        if: steps.version_check.outputs.version_changed == 'true'
+        if: ${{ steps.version_check.outputs.version_changed == 'true' }}
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
@@ -120,7 +118,7 @@ jobs:
           git push origin "v${{ steps.version_check.outputs.new_version }}"
       
       - name: Create GitHub Release
-        if: steps.version_check.outputs.version_changed == 'true'
+        if: ${{ steps.version_check.outputs.version_changed == 'true' }}
         uses: softprops/action-gh-release@v1
         with:
           tag_name: "v${{ steps.version_check.outputs.new_version }}"
@@ -153,27 +151,15 @@ jobs:
             # Start services
             tunn8n start
             ```
-            
-            ### File Structure
-            ```
-            📦 project/
-            ├── 📄 docker-compose.yml
-            ├── 📄 .env
-            ├── 📄 .env.example
-            ├── 📄 .gitignore
-            └── 📄 README.md
-            ```
           files: |
             README.md
             LICENSE
-            bin/
-            templates/
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       
       - name: Notify success
-        if: steps.version_check.outputs.version_changed == 'true'
+        if: ${{ steps.version_check.outputs.version_changed == 'true' }}
         run: |
           echo "🎉 Successfully published tunn8n v${{ steps.version_check.outputs.new_version }}"
           echo "📦 npm: https://www.npmjs.com/package/tunn8n"
@@ -182,11 +168,8 @@ jobs:
   test-cli:
     runs-on: ubuntu-latest
     needs: publish
-    if: steps.version_check.outputs.version_changed == 'true'
+    if: ${{ needs.publish.outputs.version_changed == 'true' }}
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -194,6 +177,6 @@ jobs:
       
       - name: Install tunn8n globally (from npm)
         run: |
-          npm install -g tunn8n@${{ steps.version_check.outputs.new_version }}
+          npm install -g tunn8n@latest
           tunn8n --version
           tunn8n --help
