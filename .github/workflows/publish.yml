@@ -12,8 +12,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
       
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -27,36 +25,31 @@ jobs:
       - name: Make CLI executable
         run: chmod +x bin/index.js
       
-      - name: Basic validation
+      - name: Verify essential files
         run: |
-          echo "🔍 Running basic validation..."
-          
-          # Test CLI help command
-          echo "Testing CLI help..."
-          node bin/index.js --help
-          
-          # Test CLI version command
-          echo "Testing CLI version..."
-          node bin/index.js --version
-          
-          # Check essential files
-          echo "Checking essential files..."
+          echo "📁 Checking essential files..."
           [ -f "bin/index.js" ] || { echo "❌ bin/index.js missing"; exit 1; }
           [ -d "bin/scripts" ] || { echo "❌ bin/scripts directory missing"; exit 1; }
           [ -d "templates" ] || { echo "❌ templates directory missing"; exit 1; }
-          
-          echo "✅ Basic validation passed"
+          echo "✅ All essential files present"
       
-      - name: Get version info
-        id: version_info
+      - name: Test basic CLI functionality
         run: |
-          CURRENT_VERSION=$(node -p "require('./package.json').version")
-          echo "current_version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
-          echo "Version: $CURRENT_VERSION"
+          echo "🔧 Testing CLI basic commands..."
+          node bin/index.js --version
+          node bin/index.js --help
+          echo "✅ CLI basic functionality verified"
+      
+      - name: Get package version
+        id: version
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "📦 Package version: $VERSION"
       
       - name: Publish to npm
         run: |
-          echo "🚀 Publishing version ${{ steps.version_info.outputs.current_version }} to npm..."
+          echo "🚀 Publishing to npm..."
           npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -64,34 +57,24 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: "v${{ steps.version_info.outputs.current_version }}"
-          name: "tunn8n v${{ steps.version_info.outputs.current_version }}"
+          tag_name: "v${{ steps.version.outputs.version }}"
+          name: "tunn8n v${{ steps.version.outputs.version }}"
           body: |
-            ## 🚀 tunn8n CLI v${{ steps.version_info.outputs.current_version }}
+            ## 🚀 tunn8n v${{ steps.version.outputs.version }}
             
-            Automated release of tunn8n - n8n with Docker & Ngrok integration
+            CLI tool for n8n with Docker & Ngrok integration
             
-            ### Features:
-            - `tunn8n create <project>` - Create new n8n project
-            - `tunn8n start` - Start docker services
-            - `tunn8n stop` - Stop docker services  
-            - `tunn8n status` - Check service status
-            - `tunn8n debug` - Debug mode
-            - `tunn8n init` - Initialize .env file
-            
-            ### Install:
+            **Install:**
             ```bash
             npm install -g tunn8n
             ```
           files: |
             README.md
             LICENSE
-          generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       
-      - name: Success notification
+      - name: Success message
         run: |
-          echo "🎉 Successfully published tunn8n v${{ steps.version_info.outputs.current_version }}"
+          echo "🎉 Successfully published tunn8n v${{ steps.version.outputs.version }}"
           echo "📦 npm: https://www.npmjs.com/package/tunn8n"
-          echo "🐙 GitHub: https://github.com/${{ github.repository }}/releases/tag/v${{ steps.version_info.outputs.current_version }}"
