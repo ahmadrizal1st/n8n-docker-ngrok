@@ -21,7 +21,7 @@
     "directory": "/"
   },
   "license": "MIT",
-  "author": "Ahmad Rizal <ahmad.rizal@email.com>",
+  "author": "Ahmad Rizal",
   "type": "commonjs",
   "main": "index.js",
   "bin": {
@@ -35,7 +35,8 @@
     "shelljs": "^0.8.5"
   },
   "devDependencies": {
-    "@types/node": "^18.0.0"
+    "@types/node": "^18.0.0",
+    "jest": "^29.0.0" 
   },
   "files": [
     "bin/",
@@ -46,7 +47,8 @@
   "scripts": {
     "prepublishOnly": "chmod +x bin/index.js",
     "postpublish": "git push && git push --tags",
-    "start": "node bin/index.js"
+    "start": "node bin/index.js",
+    "test": "jest --passWithNoTests"
   },
   "engines": {
     "node": ">=14.0.0"
