@@ -24,13 +24,13 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
           cache: 'npm'
       
-      - name: Install dependencies
+      - name: Install dependencies with npm
         run: npm ci
       
       - name: Make CLI executable
         run: chmod +x bin/index.js
       
-      - name: Run tests
+      - name: Run tests with npm
         run: npm test
         env:
           NODE_ENV: test
@@ -168,7 +168,7 @@ jobs:
   test-cli:
     runs-on: ubuntu-latest
     needs: publish
-    if: ${{ needs.publish.outputs.version_changed == 'true' }}
+    if: ${{ needs.publish.result == 'success' }}
     steps:
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -178,5 +178,7 @@ jobs:
       - name: Install tunn8n globally (from npm)
         run: |
           npm install -g tunn8n@latest
+          echo "Testing tunn8n installation..."
           tunn8n --version
           tunn8n --help
+          echo "✅ CLI installation test passed"
