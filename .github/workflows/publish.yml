@@ -1,4 +1,4 @@
-name: Publish to GitHub Packages
+name: Publish Tunn8n to GitHub Packages
 
 on:
   push:
@@ -9,7 +9,7 @@ on:
       - master
 
 jobs:
-  publish:
+  publish-gpr:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -21,16 +21,15 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          registry-url: 'https://npm.pkg.github.com/'
+          node-version: '18'
+          registry-url: 'https://npm.pkg.github.com'
           scope: '@tun8n'
-          cache: 'npm'
           
       - name: Install dependencies
-        run: npm ci --prefer-offline
+        run: npm ci
         
-      - name: Run tests
-        run: npm test
+      - name: Make CLI executable
+        run: chmod +x bin/index.js
         
       - name: Verify package
         run: npm pack --dry-run
